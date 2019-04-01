@@ -310,25 +310,14 @@ IconButton(
         },
         iconSize: 30,
         ),
-         IconButton(icon: Icon(Icons.menu), onPressed: () {},),
-         
+         IconButton(icon: Icon(Icons.menu), onPressed: () {},),      
   ],
 ),
-              ),
-        
-        
+              ),       
          ],)
-           
-        
-         
-         
-
-         
         ],
       ),
              ),
-      
     );
 }
-
 }
