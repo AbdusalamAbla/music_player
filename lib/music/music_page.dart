@@ -14,7 +14,7 @@ class MusicPage extends StatefulWidget{
   _MusicPageState createState()=>_MusicPageState(songModel: songModel);
 }
 
-class _MusicPageState extends State<MusicPage>{
+class _MusicPageState extends State<MusicPage> with TickerProviderStateMixin{
  
   final MusicFileModel songModel;
 
@@ -40,12 +40,17 @@ class _MusicPageState extends State<MusicPage>{
   LocalMusic _currentMusic=new LocalMusic(title: '点击歌曲进行播放',artist: '');
   StreamSubscription _positionSubscription;
   StreamSubscription _audioPlayerStateSubscription;
+  TabController _controller;
   /////////////////////////
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    _controller=TabController(vsync: this,length: _songList.length);//TODO:need test
+    
+    // _controller.addListener(controlListener);
     initAudioPlayer();
+     
   }
 
   @override
@@ -54,12 +59,14 @@ class _MusicPageState extends State<MusicPage>{
       _positionSubscription.cancel();
     _audioPlayerStateSubscription.cancel();
     audioPlayer.stop();
+    _controller.dispose();
     super.dispose();
   }
   @override
   Widget build(BuildContext context) {
     _songList=songModel.songList;
-                
+    // _controller=TabController(vsync: this,length: _songList.length);
+   
     return Scaffold(
       appBar: AppBar(
         title: Text('音乐界面'),
@@ -88,11 +95,21 @@ class _MusicPageState extends State<MusicPage>{
              model: songModel,
              child: getBody(),
            ),
-           bottomNavigationBar: getBottomBar()
+      bottomNavigationBar: getBottomBar()
     );}
 ////////Songlist /////////////
 getBody() {
   if(songModel.isFounding==false&&_songList.length!=0){
+    _controller=TabController(vsync: this,length: _songList.length);
+    _controller.addListener((){
+      if(_currentIndex!=_controller.index){
+         _currentIndex=_controller.index;
+      if (isPlaying) {
+       stop();
+     }
+    play();
+      }
+    });
     return ScopedModelDescendant<MusicFileModel>(
       builder: (context,child,songModel){
         return Scrollbar(
@@ -127,8 +144,6 @@ getBody() {
   }
 }
 
-
-
   buildListViewItem(LocalMusic music){
     return  Column(
         children: <Widget>[
@@ -160,16 +175,21 @@ getBody() {
 
 playMusic(LocalMusic music){
   _currentIndex=music.id-1;
+  _controller.index=_currentIndex;
   if (isPlaying) {
     stop();
-  }else{
-  setState(() {
-   isPlaying=true; 
-  });
   }
   play();
 }
 
+controlListener(){
+  print(_controller.index);
+  _currentIndex=_controller.index;
+  if(isPlaying){
+    stop();
+  }
+  play();
+}
 
 
 ////////player method/////
@@ -197,7 +217,6 @@ void initAudioPlayer() {
   }
 
   Future play() async {
-    _currentMusic=_songList[_currentIndex];
    await audioPlayer.play(_songList[_currentIndex].path, isLocal: true);
     
     setState(() {
@@ -229,16 +248,19 @@ void initAudioPlayer() {
 getBottomBar(){
   return BottomAppBar(
              child: Container(
-             height: 90,child: new Column(
-             mainAxisSize: MainAxisSize.max,
-             mainAxisAlignment: MainAxisAlignment.start,
-             children: <Widget>[
-               Row(
+              height: 110,
+              child: new Column(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
+                Container(
+                  height: 30,
+                  child: Row(
                  mainAxisSize: MainAxisSize.max,
                  mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                 Text(  '${positionText??''}',style: new TextStyle(fontSize: 12),),
-                 duration == null? new Slider(
+                 children: <Widget>[
+                  Text(  '${positionText??''}',style: new TextStyle(fontSize: 12),),
+                  duration == null? new Slider(
                     value:  0.0,
                     onChanged: (double value) =>
                     audioPlayer.seek((value / 1000).roundToDouble()),
@@ -259,65 +281,69 @@ getBottomBar(){
                   Text('${durationText ??''}',style: new TextStyle(fontSize: 12),),
                 ],
                ),
-       
-        
-         Row(
-           mainAxisSize: MainAxisSize.max,
-           mainAxisAlignment: MainAxisAlignment.spaceAround,
-           children: <Widget>[
-              Container(
-                width: 100,
-                child: 
-                Row(
-                  children: <Widget>[
-                    IconButton(
+                ),
+                
+               Row(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: <Widget>[
+                 Container(
+                  width: 100,
+                  height: 80,
+                  child: Row(
+                    children: <Widget>[
+                     IconButton(
                       icon: Icon(Icons.collections),
                       onPressed: (){},
-                    ),
-                    IconButton(
+                     ),
+                     IconButton(
                       icon: Icon(Icons.launch),
                       onPressed: (){},
-                    )
-                  ],
-                )
-              ),
+                     )
+                    ],
+                  )
+                 ),
               Container(
                 width: 190,
-                child: Column(
-           mainAxisSize: MainAxisSize.min,
-           mainAxisAlignment: MainAxisAlignment.start,
-          //  crossAxisAlignment: CrossAxisAlignment.start,
+                height: 80,
+                child: TabBarView(
+               controller: _controller,
+               children: _songList.map<Widget>((LocalMusic music){
+                return Column(
            children: <Widget>[
-              Text(  '${_currentMusic.title}' ,style: new TextStyle(fontSize: 18), softWrap:false,overflow: TextOverflow.fade,),
-             Text('${_currentMusic.artist}',style: new TextStyle(color: Colors.grey),softWrap: false,),
-            Container(
-              height: 5,
-            )
+              Text(  '${music.title}' ,style: new TextStyle(fontSize: 18), softWrap:false,overflow: TextOverflow.fade,),
+             Text('${music.artist}',style: new TextStyle(color: Colors.grey),softWrap: false,),
+            
            ],
-         ),
+         );
+               }).toList(),
+                )
+                
+                
               ),
               Container(
-width: 100,child: Row(
-  children: <Widget>[
-IconButton(
-        icon: isPlaying?Icon(Icons.pause):Icon(Icons.play_arrow),
-        onPressed: (){
-          if (isPlaying) {
-            pause();
-          } else {
-            play();
-          }
-        },
-        iconSize: 30,
-        ),
-         IconButton(icon: Icon(Icons.menu), onPressed: () {},),      
-  ],
-),
-              ),       
+              width: 100,
+              height: 80,
+              child: Row(
+                children: <Widget>[
+                IconButton(
+                    icon: isPlaying?Icon(Icons.pause):Icon(Icons.play_arrow),
+                     onPressed: (){
+                      if (isPlaying) {
+                  pause();
+                    } else {
+                   play();
+                    }
+                  },
+               ),
+               IconButton(icon: Icon(Icons.menu), onPressed: () {},),      
+             ],
+            ),
+          ),
          ],)
         ],
       ),
-             ),
+     ),
     );
 }
 }
