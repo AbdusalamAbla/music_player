@@ -5,14 +5,24 @@ import 'package:path/path.dart';
 import 'package:flutter/foundation.dart';
 import 'package:music_player/model/model.dart';
 import 'package:music_player/service/db_service.dart';
-
+import 'package:simple_permissions/simple_permissions.dart';
 
 class MusicFileModel extends Model {
   List<LocalMusic> _songList=[];
   bool isFounding=false;
   List<LocalMusic> get songList=>_songList;
 
+
+    Future<void> getPermission() async {
+    if (Platform.isAndroid) {
+      bool permission1 = await SimplePermissions.checkPermission(Permission.ReadExternalStorage);
+      if (!permission1) {
+        await SimplePermissions.requestPermission(Permission.ReadExternalStorage);
+      }
+    } 
+  }
   void initSongList()async{
+     
       SQLServer sqlServer=new SQLServer();
       List<Map> results=await sqlServer.query();
       LocalMusic music;
@@ -23,6 +33,7 @@ class MusicFileModel extends Model {
       notifyListeners();
     }
   void getSongListfromLocal() async{
+     getPermission();
     isFounding=true;
     notifyListeners();
     DateTime time=DateTime.now();
