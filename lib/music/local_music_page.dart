@@ -1,25 +1,27 @@
 import 'package:flutter/material.dart';
 import 'music_page_search.dart';
 import 'package:scoped_model/scoped_model.dart';
-import 'package:music_player/model/scp_model.dart';
-
+import 'package:music_player/model/music_scp_model.dart';
+import 'package:music_player/model/audio_scp_model.dart';
 import 'dart:async';
 import 'package:music_player/model/model.dart';
 import 'package:music_player/music/music_player.dart';
 
-class MusicPage extends StatefulWidget{
+class LocalMusicPage extends StatefulWidget{
   final MusicFileModel songModel;
-  MusicPage({@required this.songModel});
+  LocalMusicPage({@required this.songModel,this.audioModel,this.musicPlayer});
+  final AudioModel audioModel;
+  final MusicPlayer musicPlayer;
   @override
-  _MusicPageState createState()=>_MusicPageState(songModel: songModel);
+  _LocalMusicPageState createState()=>_LocalMusicPageState(songModel: songModel,audioModel: audioModel);
 }
 
-class _MusicPageState extends State<MusicPage> with TickerProviderStateMixin{
- 
+class _LocalMusicPageState extends State<LocalMusicPage> with TickerProviderStateMixin{
+ final MusicPlayer musicPlayer;
   final MusicFileModel songModel;
-
+  final AudioModel audioModel;
    
-  _MusicPageState({@required this.songModel});
+  _LocalMusicPageState({@required this.songModel,this.audioModel,this.musicPlayer});
   ///////variables/////////////////
   List<LocalMusic> _songList=[];
   ScrollController controller = ScrollController();
@@ -29,8 +31,9 @@ class _MusicPageState extends State<MusicPage> with TickerProviderStateMixin{
   /////////////////////////
   @override
   void initState() {
-    
+   
     super.initState();
+     
    }
 
   @override
@@ -38,14 +41,25 @@ class _MusicPageState extends State<MusicPage> with TickerProviderStateMixin{
       
     super.dispose();
   }
+
+  initBottomBar() {
+    if (audioModel.songList.length<1) {
+      return null;
+    }else{
+      return MusicPlayer(audioModel,audioModel.currentIndex);
+   }
+  }
+
   @override
   Widget build(BuildContext context) {
     _songList=songModel.songList;
+    audioModel.controller=TabController(vsync: this,length: audioModel.songList.length);
     // _controller=TabController(vsync: this,length: _songList.length);
    
     return Scaffold(
       appBar: AppBar(
-        title: Text('音乐界面'),
+        title: Text('本地音乐'),
+        centerTitle: true,
         actions: <Widget>[
           
         IconButton(
@@ -71,7 +85,7 @@ class _MusicPageState extends State<MusicPage> with TickerProviderStateMixin{
              model: songModel,
              child: getBody(),
            ),
-      bottomNavigationBar: MusicPlayer(_songList)
+      bottomNavigationBar: initBottomBar(),
     );}
 ////////Songlist /////////////
 getBody() {
@@ -114,7 +128,13 @@ getBody() {
     return  Column(
         children: <Widget>[
           ListTile(
-            onTap: ()=>(){print('${music.id}');},
+            onTap: (){
+              setState(() {
+               audioModel.songList=_songList; 
+              });
+              audioModel.changeIndex(music.id-1); 
+              audioModel.play();
+            },
             title: Row(
               children: <Widget>[
                 Expanded(child: Text(  '${music.title}'  )),//file.path.substring(file.parent.path.length + 1)
@@ -137,8 +157,5 @@ getBody() {
         
       );
   }
-
-
-
 
 }
