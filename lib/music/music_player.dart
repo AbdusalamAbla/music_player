@@ -132,22 +132,7 @@ final AudioModel _audioModel;
                 mainAxisSize: MainAxisSize.max,
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: <Widget>[
-                 Container(
-                  width: 100,
-                  height: 80,
-                  child: Row(
-                    children: <Widget>[
-                     IconButton(
-                      icon: Icon(Icons.collections),
-                      onPressed: (){},
-                     ),
-                     IconButton(
-                      icon: Icon(Icons.launch),
-                      onPressed: (){},
-                     )
-                    ],
-                  )
-                 ),
+                 
               Container(
                 width: 190,
                 height: 80,

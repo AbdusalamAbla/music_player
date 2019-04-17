@@ -142,7 +142,7 @@ getBody() {
               ],
             ),
             subtitle:  Text(
-                    '${music.artist}    ${music.size}',
+                    '${music.artist}',
                     style: TextStyle(fontSize: 12.0),
                   ),
           trailing:  null ,
