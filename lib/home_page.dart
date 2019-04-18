@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:music_player/music/music_player.dart';
-import 'package:music_player/model/music_scp_model.dart';
+
 import 'package:music_player/model/audio_scp_model.dart';
-import 'routes.dart';
-import 'main/main_local.dart';
-import 'main/main_cloud.dart';
+import 'package:music_player/model/music_scp_model.dart';
+import 'package:music_player/music/music_player.dart';
+
+import 'package:music_player/main/main_cloud.dart';
+import 'package:music_player/main/main_local.dart';
+import 'package:music_player/music/music_page_search.dart';
+import 'package:music_player/routes.dart';
 class HomePage extends StatefulWidget{
   @override
   _HomePageState createState()=>_HomePageState();
@@ -17,7 +20,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   final MusicFileModel songModel=MusicFileModel();
   final AudioModel audioModel=AudioModel();
   MusicPlayer musicPlayer;
-
+   int _lastIntegerSelected;
    final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   ProxyAnimation transitionAnimation =
@@ -31,7 +34,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     songModel.getSongListfromLocal();
     audioModel.initAudioPlayer();
     _tabController=TabController(vsync: this,length: 2);
-    audioModel.songList=songModel.songList;
     musicPlayer=new MusicPlayer(audioModel,audioModel.currentIndex);
   }
   
@@ -62,7 +64,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                           Divider(height: 0, indent: 16),
                           ListTile(
                             leading: Icon(Icons.format_quote),
-                            title: Text("Star On GitHub"),
+                            title: Text("关于开发人员"),
                             onTap: () {
                               // launch(
                               //     "https://github.com/boyan01/quiet-flutter");
@@ -77,6 +79,40 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           ),
       ),
       appBar: AppBar(
+        centerTitle: true,
+        title: Container(
+            height: kToolbarHeight,
+            width: 128,
+            child: TabBar(
+              controller: _tabController,
+              indicator:
+                  UnderlineTabIndicator(insets: EdgeInsets.only(bottom: 4)),
+              indicatorSize: TabBarIndicatorSize.label,
+              tabs: <Widget>[
+                Tab(child: Icon(Icons.music_note)),
+                Tab(child: Icon(Icons.cloud)),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+          
+        IconButton(
+            tooltip: 'Search',
+            icon: const Icon(Icons.search),
+            onPressed: () async {
+              final int selected = await showSearch<int>(
+                context: context,
+                delegate: searchDelegate,
+              );
+              if (selected != null && selected != _lastIntegerSelected) {
+                setState(() {
+                  _lastIntegerSelected = selected;
+                });
+              }
+            },
+          ),
+        
+      ],
         leading: IconButton(
               icon: AnimatedIcon(
                   icon: AnimatedIcons.menu_arrow,

@@ -15,9 +15,9 @@ class _SearchDemoSearchDelegate extends SearchDelegate<int> {
         progress: transitionAnimation,
       ),
       onPressed: () {
-        for (int item in _data) {
-          debugPrint("$item");
-        }
+        // for (int item in _data) {
+        //   debugPrint("$item");
+        // }
         close(context, null);
         
       },

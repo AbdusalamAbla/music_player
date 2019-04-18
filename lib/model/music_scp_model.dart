@@ -1,63 +1,50 @@
-import 'package:scoped_model/scoped_model.dart';
-import 'package:path_provider/path_provider.dart';
 import 'dart:io';
-import 'package:path/path.dart';
+
 import 'package:flutter/foundation.dart';
 import 'package:music_player/model/model.dart';
 import 'package:music_player/service/db_service.dart';
+import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:scoped_model/scoped_model.dart';
 import 'package:simple_permissions/simple_permissions.dart';
 
+enum SongModelAction{START,SEARCHING,FOUNDED,ERROR}
+
 class MusicFileModel extends Model {
-  List<LocalMusic> _songList=[];
-  bool isFounding=false;
-  List<LocalMusic> get songList=>_songList;
+   List<LocalMusic> _songList=[];
+   SongModelAction status=SongModelAction.START;
+   List<LocalMusic> get songList=>_songList;
 
-
-    Future<void> getPermission() async {
-    if (Platform.isAndroid) {
-      bool permission1 = await SimplePermissions.checkPermission(Permission.ReadExternalStorage);
-      if (!permission1) {
-        await SimplePermissions.requestPermission(Permission.ReadExternalStorage);
-      }
-    } 
-  }
-  void initSongList()async{
-     
-      SQLServer sqlServer=new SQLServer();
-      List<Map> results=await sqlServer.query();
-      LocalMusic music;
-      for (Map item in results) {
-        music=LocalMusic.fromJson(item);
-        _songList.add(music);
-      }
-      notifyListeners();
-    }
   void getSongListfromLocal() async{
-     getPermission();
-    isFounding=true;
-    notifyListeners();
-    DateTime time=DateTime.now();
-    print(time);
-    SQLServer sqlServer=new SQLServer();
-    List<Map> results=await sqlServer.query();
-    if (results.length<1) {
-    var path=(await getExternalStorageDirectory()).path;
-    _songList = await compute(_findFileInDir, path);
+    bool permission = await SimplePermissions.checkPermission(Permission.ReadExternalStorage);
+      
+      if (!permission) {
+        //* 没有权限，设置statu为ERROR，申请读取文件权限
+        status=SongModelAction.ERROR;
+        await SimplePermissions.requestPermission(Permission.ReadExternalStorage);
+      }else{
+        //* 有权限，设置status为SEARCHING，先从数据库中找，没找到则开始从文件列表找
+       status=SongModelAction.SEARCHING;
+       notifyListeners();
+       SQLServer sqlServer=new SQLServer();
+       List<Map> results=await sqlServer.query();
+       if (results.length<1) {
+       var path=(await getExternalStorageDirectory()).path;
+       _songList = await compute(_findFileInDir, path);
           for (LocalMusic item in _songList) {
             sqlServer.addLocalFile(item);
           }
-    }else{
-      LocalMusic music;
-      for (Map item in results) {
-        music=LocalMusic.fromJson(item);
-        _songList.add(music);
-      }
+       }else{
+        LocalMusic music;
+         for (Map item in results) {
+           music=LocalMusic.fromJson(item);
+           _songList.add(music);
+         }
     }
-    time=DateTime.now();
-    print(time);
-   
-   isFounding=false;
-   notifyListeners();
+        //* 查找完毕，设置status为FOUNDED,通知更新
+      status=SongModelAction.FOUNDED;
+      notifyListeners();
+      }
   }
   
   static List<LocalMusic> _findFileInDir(String path){

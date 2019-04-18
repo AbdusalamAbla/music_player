@@ -35,9 +35,8 @@ class SQLServer{
      });
      
      await database.transaction((txn) async {
-       int id = await txn.rawInsert(
+      await txn.rawInsert(
       'INSERT INTO $tableName(title,artist,path,modify, size) VALUES("${model.title}", "${model.artist}","${model.path}", "${model.modify}","${model.size}")');
-        print('insert:$id');
 }); 
   }
   
