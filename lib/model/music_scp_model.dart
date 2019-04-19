@@ -2,11 +2,11 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:music_player/model/model.dart';
-import 'package:music_player/service/db_service.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:simple_permissions/simple_permissions.dart';
+import 'package:music_player/service/local_data.dart';
 
 enum SongModelAction{START,SEARCHING,FOUNDED,ERROR}
 
@@ -14,38 +14,39 @@ class MusicFileModel extends Model {
    List<LocalMusic> _songList=[];
    SongModelAction status=SongModelAction.START;
    List<LocalMusic> get songList=>_songList;
+MusicFileModel(){
+  initSongList();
+}
 
-  void getSongListfromLocal() async{
-    bool permission = await SimplePermissions.checkPermission(Permission.ReadExternalStorage);
+initSongList()async{
+  bool permission = await SimplePermissions.checkPermission(Permission.ReadExternalStorage);
       
-      if (!permission) {
+  if (!permission) {
         //* 没有权限，设置statu为ERROR，申请读取文件权限
         status=SongModelAction.ERROR;
         await SimplePermissions.requestPermission(Permission.ReadExternalStorage);
-      }else{
-        //* 有权限，设置status为SEARCHING，先从数据库中找，没找到则开始从文件列表找
-       status=SongModelAction.SEARCHING;
+  }else{
+     status=SongModelAction.SEARCHING;
+    _songList=await myData.getLocalMusiclist();
+    if(_songList.length>1){
+       print('找到数据');
+       status=SongModelAction.FOUNDED;
        notifyListeners();
-       SQLServer sqlServer=new SQLServer();
-       List<Map> results=await sqlServer.query();
-       if (results.length<1) {
-       var path=(await getExternalStorageDirectory()).path;
-       _songList = await compute(_findFileInDir, path);
-          for (LocalMusic item in _songList) {
-            sqlServer.addLocalFile(item);
-          }
-       }else{
-        LocalMusic music;
-         for (Map item in results) {
-           music=LocalMusic.fromJson(item);
-           _songList.add(music);
-         }
+      return _songList;
+       //* 没找到数据，进行查找工作，再返回数据
+      
     }
-        //* 查找完毕，设置status为FOUNDED,通知更新
-      status=SongModelAction.FOUNDED;
-      notifyListeners();
+    print('未找到数据,进行文件遍历');
+    var path=(await getExternalStorageDirectory()).path;
+       _songList = await compute(_findFileInDir, path);
+    myData.updateUserPlaylist(_songList);
+    status=SongModelAction.FOUNDED;
+    notifyListeners();
+    return _songList;
+    
       }
-  }
+     
+}
   
   static List<LocalMusic> _findFileInDir(String path){
 

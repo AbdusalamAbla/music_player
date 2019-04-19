@@ -31,7 +31,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   @override
   void initState() {
     super.initState();
-    songModel.getSongListfromLocal();
+    // songModel.getSongListfromLocal();
     audioModel.initAudioPlayer();
     _tabController=TabController(vsync: this,length: 2);
     musicPlayer=new MusicPlayer(audioModel,audioModel.currentIndex);

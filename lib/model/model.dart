@@ -1,6 +1,4 @@
-import 'package:json_annotation/json_annotation.dart';
 
-part 'model.g.dart';
 
 abstract class ModelBase {
    String type;
@@ -12,7 +10,6 @@ abstract class ModelBase {
   String size;
 }
 
-@JsonSerializable()
 class LocalMusic extends ModelBase {
   
   LocalMusic({this.id,this.title,this.artist,this.path,this.modify,this.size}){
@@ -25,10 +22,31 @@ class LocalMusic extends ModelBase {
  final String modify;
  final String size;
 
+  @override
+  String toString() {
+    return 'LocalMusic{id: $id, title: $title, artist:$artist, path:$path,size:$size}';
+  }
 
- factory LocalMusic.fromJson(Map<String,dynamic> json)=>_$LocalMusicFromJson(json);
+ factory LocalMusic.fromJson(Map<String,dynamic> json){
+   return LocalMusic(
+      id: json['id'] as int,
+      title: json['title'] as String,
+      artist: json['artist']as String,
+      path: json['path'] as String,
+      modify: json['modify'] as String,
+      size: json['size'] as String);
+ }
 
- Map<String,dynamic> toJson()=>_$LocalMusicToJson(this);
+ Map<String,dynamic> toJson(){
+    return <String, dynamic>{
+      'id': id,
+      'title': title,
+      'artist':artist,
+      'path': path,
+      'modify': modify,
+      'size': size
+    };
+ }
 }
 
 

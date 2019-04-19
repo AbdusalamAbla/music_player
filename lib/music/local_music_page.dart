@@ -80,7 +80,8 @@ getBody() {
                setState(() {
                  songModel.status=SongModelAction.SEARCHING;
               });
-              songModel.getSongListfromLocal();
+              // songModel.getSongListfromLocal();
+              songModel.initSongList();
              
             },child: Text('获取本地歌曲'),),
          );         break;

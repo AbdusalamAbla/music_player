@@ -31,8 +31,8 @@ void initAudioPlayer() {
   Future play() async {
     if(isPlaying){
       stop();
-      isPlaying=false;
     }
+    print(currentIndex);
    await audioPlayer.play(songList[currentIndex].path, isLocal: true);
    isPlaying = true;
    notifyListeners();

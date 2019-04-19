@@ -10,7 +10,6 @@ class SettingPage extends StatefulWidget{
 class _SettingPageState extends State<SettingPage>{
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return Scaffold(
       appBar: AppBar(
         title: Text('设置页面'),
