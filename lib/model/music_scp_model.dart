@@ -14,20 +14,20 @@ class MusicFileModel extends Model {
    List<LocalMusic> _songList=[];
    SongModelAction status=SongModelAction.START;
    List<LocalMusic> get songList=>_songList;
-MusicFileModel(){
-  initSongList();
-}
+   MusicFileModel(){
+    initSongList();
+   }
 
-initSongList()async{
-  bool permission = await SimplePermissions.checkPermission(Permission.ReadExternalStorage);
+    initSongList()async{
+    bool permission = await SimplePermissions.checkPermission(Permission.ReadExternalStorage);
       
-  if (!permission) {
+    if (!permission) {
         //* 没有权限，设置statu为ERROR，申请读取文件权限
         status=SongModelAction.ERROR;
         await SimplePermissions.requestPermission(Permission.ReadExternalStorage);
-  }else{
-     status=SongModelAction.SEARCHING;
-    _songList=await myData.getLocalMusiclist();
+    }else{
+       status=SongModelAction.SEARCHING;
+      _songList=await myData.getLocalMusiclist();
     if(_songList.length>1){
        print('找到数据');
        status=SongModelAction.FOUNDED;
