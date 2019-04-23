@@ -3,11 +3,15 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
+import 'local_data.dart';
+import 'package:music_player/actor/load_net_data.dart';
+import 'package:music_player/model/model.dart';
+import 'package:music_player/model/playlist_detail.dart';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 
 export 'local_data.dart';
@@ -38,17 +42,17 @@ const _CODE_SUCCESS = 200;
 const _CODE_NEED_LOGIN = 301;
 
 class NeteaseRepository {
-  ///to verify api response is success
-  // final TaskResultVerify responseVerify = (dynamic result) {
-  //   if (result == null) {
-  //     return VerifyValue.errorMsg("请求失败");
-  //   }
-  //   if (result["code"] != _CODE_SUCCESS) {
-  //     return VerifyValue.errorMsg(
-  //         "code:${result["code"]} \nmsg:${result["msg"]}");
-  //   }
-  //   return VerifyValue.success(result);
-  // };
+  // to verify api response is success
+  final TaskResultVerify responseVerify = (dynamic result) {
+    if (result == null) {
+      return VerifyValue.errorMsg("请求失败");
+    }
+    if (result["code"] != _CODE_SUCCESS) {
+      return VerifyValue.errorMsg(
+          "code:${result["code"]} \nmsg:${result["msg"]}");
+    }
+    return VerifyValue.success(result);
+  };
 
   static const String _BASE_URL = "http://music.163.com";
 
@@ -76,14 +80,14 @@ class NeteaseRepository {
       ..add(CookieManager(_cookieJar))
       ..add(InterceptorsWrapper(onRequest: (options) {
         debugPrint("request header :${options.headers}");
-//      debugPrint("request cookie :${options.data}");
+        debugPrint("request cookie :${options.data}");
         return options;
       }));
 
     return _dio;
   }
 
-  ///使用手机号码登录
+  //* 使用手机号码登录
   Future<Map> login(String phone, String password) async {
     var request = {
       "phone": phone,
@@ -98,7 +102,7 @@ class NeteaseRepository {
     throw '登陆失败';
   }
 
-  ///刷新登陆状态
+  //* 刷新登陆状态
   ///返回结果：true 正常登陆状态
   ///         false 需要重新登陆
   Future<bool> refreshLogin() async {
@@ -119,56 +123,56 @@ class NeteaseRepository {
     _cookieJar.delete(Uri.parse(_BASE_URL));
   }
 
-  ///根据用户ID获取歌单
-  ///PlayListDetail 中的 tracks 都是空数据
-  // Future<List<PlaylistDetail>> userPlaylist(int userId,
-  //     [int offset = 0, int limit = 1000]) async {
-  //   final response = await doRequest("/weapi/user/playlist",
-  //       {"offset": offset, "uid": userId, "limit": limit, "csrf_token": ""});
-  //   if (responseVerify(response).isSuccess) {
-  //     final list = (response["playlist"] as List)
-  //         .cast<Map>()
-  //         .map((e) => PlaylistDetail.fromJson(e))
-  //         .toList();
-  //     neteaseLocalData.updateUserPlaylist(userId, list);
-  //     return list;
-  //   }
-  //   return null;
-  // }
+  //* 根据用户ID获取歌单
+  //PlayListDetail 中的 tracks 都是空数据
+  Future<List<PlaylistDetail>> userPlaylist(int userId,
+      [int offset = 0, int limit = 1000]) async {
+    final response = await doRequest("/weapi/user/playlist",
+        {"offset": offset, "uid": userId, "limit": limit, "csrf_token": ""});
+    if (responseVerify(response).isSuccess) {
+      final list = (response["playlist"] as List)
+          .cast<Map>()
+          .map((e) => PlaylistDetail.fromJson(e))
+          .toList();
+      myData.updateUserNetMusicList(userId, list);
+      return list;
+    }
+    return null;
+  }
 
   // ///create new playlist by [name]
-  // Future<PlaylistDetail> createPlaylist(String name) async {
-  //   final response = await doRequest(
-  //       "https://music.163.com/weapi/playlist/create", {"name": name},
-  //       options: Options(headers: {"User-Agent": _chooseUserAgent(ua: "pc")}));
-  //   if (responseVerify(response).isSuccess) {
-  //     return PlaylistDetail.fromJson(response["playlist"]);
-  //   }
-  //   return Future.error(response["msg"] ?? "error:${response["code"]}");
-  // }
+  Future<PlaylistDetail> createPlaylist(String name) async {
+    final response = await doRequest(
+        "https://music.163.com/weapi/playlist/create", {"name": name},
+        options: Options(headers: {"User-Agent": _chooseUserAgent(ua: "pc")}));
+    if (responseVerify(response).isSuccess) {
+      return PlaylistDetail.fromJson(response["playlist"]);
+    }
+    return Future.error(response["msg"] ?? "error:${response["code"]}");
+  }
 
   // ///根据歌单id获取歌单详情，包括歌曲
-  // Future<PlaylistDetail> playlistDetail(int id) async {
-  //   final response = await doRequest(
-  //       "https://music.163.com/weapi/v3/playlist/detail",
-  //       {"id": "$id", "n": 100000, "s": 8},
-  //       type: EncryptType.linux);
-  //   if (responseVerify(response).isSuccess) {
-  //     final result = PlaylistDetail.fromJson(response["playlist"]);
-  //     neteaseLocalData.updatePlaylistDetail(result);
-  //     return result;
-  //   }
-  //   return null;
-  // }
+  Future<PlaylistDetail> playlistDetail(int id) async {
+    final response = await doRequest(
+        "https://music.163.com/weapi/v3/playlist/detail",
+        {"id": "$id", "n": 100000, "s": 8},
+        type: EncryptType.linux);
+    if (responseVerify(response).isSuccess) {
+      final result = PlaylistDetail.fromJson(response["playlist"]);
+      myData.updatePlaylistDetail(result);
+      return result;
+    }
+    return null;
+  }
 
   // ///id 歌单id
   // ///return true if action success
-  // Future<bool> playlistSubscribe(int id, bool subscribe) async {
-  //   String action = subscribe ? "subscribe" : "unsubscribe";
-  //   final response = await doRequest(
-  //       "https://music.163.com/weapi/playlist/$action", {"id": id});
-  //   return responseVerify(response).isSuccess;
-  // }
+  Future<bool> playlistSubscribe(int id, bool subscribe) async {
+    String action = subscribe ? "subscribe" : "unsubscribe";
+    final response = await doRequest(
+        "https://music.163.com/weapi/playlist/$action", {"id": id});
+    return responseVerify(response).isSuccess;
+  }
 
   ///根据专辑详细信息
   Future<Map> albumDetail(int id) async {
@@ -251,27 +255,27 @@ class NeteaseRepository {
 
   ///搜索建议
   ///返回搜索建议列表，结果一定不会为null
-  // Future<List<String>> searchSuggest(String keyword) async {
-  //   if (keyword == null || keyword.isEmpty || keyword.trim().isEmpty) {
-  //     return [];
-  //   }
-  //   keyword = keyword.trim();
-  //   try {
-  //     final response = await doRequest(
-  //         "https://music.163.com/weapi/search/suggest/keyword", {"s": keyword});
-  //     if (!responseVerify(response).isSuccess) {
-  //       return [];
-  //     }
-  //     List<Map> match = ((response["result"]["allMatch"]) as List)?.cast();
-  //     if (match == null) {
-  //       return [];
-  //     }
-  //     return match.map((m) => m["keyword"]).cast<String>().toList();
-  //   } catch (e) {
-  //     debugPrint(e.toString());
-  //     return [];
-  //   }
-  // }
+  Future<List<String>> searchSuggest(String keyword) async {
+    if (keyword == null || keyword.isEmpty || keyword.trim().isEmpty) {
+      return [];
+    }
+    keyword = keyword.trim();
+    try {
+      final response = await doRequest(
+          "https://music.163.com/weapi/search/suggest/keyword", {"s": keyword});
+      if (!responseVerify(response).isSuccess) {
+        return [];
+      }
+      List<Map> match = ((response["result"]["allMatch"]) as List)?.cast();
+      if (match == null) {
+        return [];
+      }
+      return match.map((m) => m["keyword"]).cast<String>().toList();
+    } catch (e) {
+      debugPrint(e.toString());
+      return [];
+    }
+  }
 
   ///check music is available
   Future<bool> checkMusic(int id) async {
@@ -372,62 +376,62 @@ class NeteaseRepository {
   // }
 
   // ///给歌曲加红心
-  // Future<bool> like(int musicId, bool like) async {
-  //   try {
-  //     final response = await doRequest(
-  //         "https://music.163.com/weapi/radio/like?alg=itembased&trackId=$musicId&like=$like&time=25",
-  //         {"trackId": musicId, "like": like});
-  //     return responseVerify(response).isSuccess;
-  //   } catch (e) {
-  //     return false;
-  //   }
-  // }
+  Future<bool> like(int musicId, bool like) async {
+    try {
+      final response = await doRequest(
+          "https://music.163.com/weapi/radio/like?alg=itembased&trackId=$musicId&like=$like&time=25",
+          {"trackId": musicId, "like": like});
+      return responseVerify(response).isSuccess;
+    } catch (e) {
+      return false;
+    }
+  }
 
   // ///获取用户红心歌曲id列表
-  // Future<List<int>> likedList(int userId) async {
-  //   final response = await doRequest(
-  //       "https://music.163.com/weapi/song/like/get", {"uid": userId});
-  //   final result = responseVerify(response);
-  //   if (result.isSuccess) {
-  //     return (response["ids"] as List).cast();
-  //   }
-  //   throw result.errorMsg;
-  // }
+  Future<List<int>> likedList(int userId) async {
+    final response = await doRequest(
+        "https://music.163.com/weapi/song/like/get", {"uid": userId});
+    final result = responseVerify(response);
+    if (result.isSuccess) {
+      return (response["ids"] as List).cast();
+    }
+    throw result.errorMsg;
+  }
 
   // ///获取用户信息 , 歌单，收藏，mv, dj 数量
-  // FutureOr<Map> subCount() async {
-  //   final response =
-  //       await doRequest('https://music.163.com/weapi/subcount', {});
-  //   final result = responseVerify(response);
-  //   if (result.isSuccess) {
-  //     return response;
-  //   }
-  //   return Future.error(result.errorMsg);
-  // }
+  FutureOr<Map> subCount() async {
+    final response =
+        await doRequest('https://music.163.com/weapi/subcount', {});
+    final result = responseVerify(response);
+    if (result.isSuccess) {
+      return response;
+    }
+    return Future.error(result.errorMsg);
+  }
 
   // ///获取用户创建的电台
-  // Future<List<Map>> userDj(int userId) async {
-  //   final response = await doRequest(
-  //       'https://music.163.com/weapi/dj/program/$userId',
-  //       {'limit': 30, 'offset': 0});
-  //   final result = responseVerify(response);
-  //   if (result.isSuccess) {
-  //     return (response['programs'] as List).cast();
-  //   }
-  //   throw result.errorMsg;
-  // }
+  Future<List<Map>> userDj(int userId) async {
+    final response = await doRequest(
+        'https://music.163.com/weapi/dj/program/$userId',
+        {'limit': 30, 'offset': 0});
+    final result = responseVerify(response);
+    if (result.isSuccess) {
+      return (response['programs'] as List).cast();
+    }
+    throw result.errorMsg;
+  }
 
   // ///登陆后调用此接口 , 可获取订阅的电台列表
-  // Future<List<Map>> djSubList() async {
-  //   final response = await doRequest(
-  //       'https://music.163.com/weapi/djradio/get/subed',
-  //       {'total': true, 'offset': 0, 'limit': 30});
-  //   final result = responseVerify(response);
-  //   if (result.isSuccess) {
-  //     return (response['djRadios'] as List).cast();
-  //   }
-  //   throw result.errorMsg;
-  // }
+  Future<List<Map>> djSubList() async {
+    final response = await doRequest(
+        'https://music.163.com/weapi/djradio/get/subed',
+        {'total': true, 'offset': 0, 'limit': 30});
+    final result = responseVerify(response);
+    if (result.isSuccess) {
+      return (response['djRadios'] as List).cast();
+    }
+    throw result.errorMsg;
+  }
 
   ///获取对应 MV 数据 , 数据包含 mv 名字 , 歌手 , 发布时间 , mv 视频地址等数据
   Future<Map> mvDetail(int mvId) {
@@ -435,16 +439,16 @@ class NeteaseRepository {
   }
 
   ///调用此接口,可收藏 MV
-  // Future<void> mvSubscribe(int mvId, bool subscribe) async {
-  //   final action = subscribe ? 'sub' : 'unsub';
-  //   final result = responseVerify(await doRequest(
-  //       'https://music.163.com/weapi/mv/$action',
-  //       {'mvId': mvId, 'mvIds': '["$mvId"]'}));
-  //   if (result.isSuccess) {
-  //     return;
-  //   }
-  //   throw result.errorMsg;
-  // }
+  Future<void> mvSubscribe(int mvId, bool subscribe) async {
+    final action = subscribe ? 'sub' : 'unsub';
+    final result = responseVerify(await doRequest(
+        'https://music.163.com/weapi/mv/$action',
+        {'mvId': mvId, 'mvIds': '["$mvId"]'}));
+    if (result.isSuccess) {
+      return;
+    }
+    throw result.errorMsg;
+  }
 
   ///获取用户播放记录
   ///type : 0 all , 1 this week
@@ -562,37 +566,37 @@ String _chooseUserAgent({String ua}) {
   return _USER_AGENT_LIST[index];
 }
 
-// Music mapJsonToMusic(Map song,
-//     {String artistKey = "artists", String albumKey = "album"}) {
-//   Map album = song[albumKey] as Map;
+NetMusic mapJsonToMusic(Map song,
+    {String artistKey = "artists", String albumKey = "album"}) {
+  Map album = song[albumKey] as Map;
 
-//   List<Artist> artists = (song[artistKey] as List).cast<Map>().map((e) {
-//     return Artist(
-//       name: e["name"],
-//       id: e["id"],
-//     );
-//   }).toList();
+  List<Artist> artists = (song[artistKey] as List).cast<Map>().map((e) {
+    return Artist(
+      name: e["name"],
+      id: e["id"],
+    );
+  }).toList();
 
-//   return Music(
-//       id: song["id"],
-//       title: song["name"],
-//       mvId: song['mv'] ?? 0,
-//       url: "http://music.163.com/song/media/outer/url?id=${song["id"]}.mp3",
-//       album: Album(
-//           id: album["id"], name: album["name"], coverImageUrl: album["picUrl"]),
-//       artist: artists);
-// }
+  return NetMusic(
+      id: song["id"],
+      title: song["name"],
+      mvId: song['mv'] ?? 0,
+      url: "http://music.163.com/song/media/outer/url?id=${song["id"]}.mp3",
+      album: Album(
+          id: album["id"], name: album["name"], coverImageUrl: album["picUrl"]),
+      artist: artists);
+}
 
-// List<Music> mapJsonListToMusicList(List tracks,
-//     {String artistKey = "artists", String albumKey = "album"}) {
-//   if (tracks == null) {
-//     return null;
-//   }
-//   var list = tracks
-//       .cast<Map>()
-//       .map((e) => mapJsonToMusic(e, artistKey: "ar", albumKey: "al"));
-//   return list.toList();
-// }
+List<NetMusic> mapJsonListToMusicList(List tracks,
+    {String artistKey = "artists", String albumKey = "album"}) {
+  if (tracks == null) {
+    return null;
+  }
+  var list = tracks
+      .cast<Map>()
+      .map((e) => mapJsonToMusic(e, artistKey: "ar", albumKey: "al"));
+  return list.toList();
+}
 
 // ///cache key for lyric
 // class _LyricCacheKey implements CacheKey {

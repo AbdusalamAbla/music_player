@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:music_player/material/DividerWrapper.dart';
 import 'package:music_player/model/audio_scp_model.dart';
 import 'package:music_player/model/music_scp_model.dart';
-import 'package:music_player/music/local_music_page.dart';
+import 'package:music_player/local/local_music_page.dart';
 
 import 'package:overlay_support/overlay_support.dart';
 class MainLocalPage extends StatefulWidget{

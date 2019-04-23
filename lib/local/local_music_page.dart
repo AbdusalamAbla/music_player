@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:music_player/model/audio_scp_model.dart';
 import 'package:music_player/model/model.dart';
 import 'package:music_player/model/music_scp_model.dart';
-import 'package:music_player/music/music_player.dart';
+import 'package:music_player/player/music_player.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:draggable_scrollbar/draggable_scrollbar.dart';
 import 'music_page_search.dart';

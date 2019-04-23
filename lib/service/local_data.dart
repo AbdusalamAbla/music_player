@@ -1,9 +1,10 @@
 import 'dart:async';
 
 import 'data_base.dart';
-
-import 'package:flutter/foundation.dart';
 import 'package:music_player/model/model.dart';
+import 'package:music_player/model/playlist_detail.dart';
+import 'package:flutter/foundation.dart';
+
 import 'package:sembast/sembast.dart';
 
 AppLocalData myData=AppLocalData._();
@@ -70,8 +71,8 @@ FutureOr operator [](key) async {
   Future _put(dynamic value, [dynamic key]) async {
     return (await store).put(value, key);
   }
-
-  Future<List<LocalMusic>> getLocalMusiclist() async {
+  //*  获得本地歌曲列表
+  Future<List<LocalMusic>> getLocalMusicList() async {
     final data = await get("localmusiclist");
     if (data == null) {
       return [];
@@ -83,8 +84,30 @@ FutureOr operator [](key) async {
     return result;
   }
 
-  void updateUserPlaylist(List<LocalMusic> list) {
+  //* 更新本地歌曲列表
+  void updateLocalMusicList(List<LocalMusic> list) {
     _put(list.map((p) => p.toJson()).toList(), "localmusiclist");
+  }
+  //*  获得用户网络歌单
+  Future<List<PlaylistDetail>> getUserNetMusicList(int userId) async {
+    final data = await get("user_playlist_$userId");
+    if (data == null) {
+      return null;
+    }
+    final result = (data as List)
+        .cast<Map>()
+        .map((m) => PlaylistDetail.fromMap(m))
+        .toList();
+    return result;
+  }
+  //* 存储(更新)用户网络歌单
+  void updateUserNetMusicList(int userId,List<PlaylistDetail> list){
+       _put(list.map((p) => p.toMap()).toList(), "user_playlist_$userId");
+  }
+  //*  存储歌单
+  Future updatePlaylistDetail(PlaylistDetail playlistDetail) {
+    assert(playlistDetail.loaded);
+    return _put(playlistDetail.toMap(), 'playlist_detail_${playlistDetail.id}');
   }
 
 }

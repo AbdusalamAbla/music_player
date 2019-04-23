@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 
 import 'package:music_player/model/audio_scp_model.dart';
 import 'package:music_player/model/music_scp_model.dart';
-import 'package:music_player/music/music_player.dart';
+import 'package:music_player/player/music_player.dart';
 
 import 'package:music_player/main/main_cloud.dart';
 import 'package:music_player/main/main_local.dart';
-import 'package:music_player/music/music_page_search.dart';
+import 'package:music_player/localmusic/music_page_search.dart';
 import 'package:music_player/routes.dart';
 class HomePage extends StatefulWidget{
   @override

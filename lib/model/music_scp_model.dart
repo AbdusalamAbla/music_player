@@ -27,7 +27,7 @@ class MusicFileModel extends Model {
         await SimplePermissions.requestPermission(Permission.ReadExternalStorage);
     }else{
        status=SongModelAction.SEARCHING;
-      _songList=await myData.getLocalMusiclist();
+      _songList=await myData.getLocalMusicList();
     if(_songList.length>1){
        print('找到数据');
        status=SongModelAction.FOUNDED;
@@ -39,7 +39,7 @@ class MusicFileModel extends Model {
     print('未找到数据,进行文件遍历');
     var path=(await getExternalStorageDirectory()).path;
        _songList = await compute(_findFileInDir, path);
-    myData.updateUserPlaylist(_songList);
+    myData.updateLocalMusicList(_songList);
     status=SongModelAction.FOUNDED;
     notifyListeners();
     return _songList;
