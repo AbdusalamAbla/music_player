@@ -1,4 +1,4 @@
-import 'package:music_player/model/model.dart';
+import 'package:music_player/models/model.dart';
 import 'package:audioplayer/audioplayer.dart';
 import 'dart:async';
 import 'package:scoped_model/scoped_model.dart';

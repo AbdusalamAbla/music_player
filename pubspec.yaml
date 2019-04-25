@@ -52,6 +52,8 @@ flutter:
   # the material Icons class.
   uses-material-design: true
 
+  assets:
+    - assets/playlist_playlist.9.png
   # To add assets to your application, add an assets section, like this:
   # assets:
   #  - images/a_dot_burr.jpeg

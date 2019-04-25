@@ -1,8 +1,11 @@
 import 'dart:async';
+
 import 'package:async/async.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+
 import 'package:overlay_support/overlay_support.dart';
+
 class VerifyValue<T>{
 
   VerifyValue.success(this.result);
@@ -22,7 +25,7 @@ final TaskResultVerify _emptyVerify=(dynamic result){
   return VerifyValue.success(result);
 };
 
-TaskResultVerify<T> simgpleLoaderResultVerify<T>(bool test(T t),{String errorMsg="failed"}){
+TaskResultVerify<T> simpleLoaderResultVerify<T>(bool test(T t),{String errorMsg="failed"}){
   assert(errorMsg != null);
   TaskResultVerify<T> verify = (result) {
     if (test(result)) {
@@ -82,8 +85,8 @@ class Loader<T> extends StatefulWidget{
 
 
   
-  static _LoaderState<T> of<T>(BuildContext context) {
-    return context.ancestorStateOfType(const TypeMatcher<_LoaderState>());
+  static LoaderState<T> of<T>(BuildContext context) {
+    return context.ancestorStateOfType(const TypeMatcher<LoaderState>());
   }
 
   static Widget buildSimpleFailedWidget<T>(
@@ -122,7 +125,7 @@ class Loader<T> extends StatefulWidget{
   }
 
   @override
-  State<StatefulWidget> createState()=>_LoaderState<T>();
+  State<StatefulWidget> createState()=>LoaderState<T>();
   }
 
 enum _LoadState {
@@ -130,7 +133,7 @@ enum _LoadState {
   success,
   failed,
 }
-class _LoaderState<T> extends State<Loader>{
+class LoaderState<T> extends State<Loader>{
 
   _LoadState state=_LoadState.loading;
 
@@ -141,7 +144,6 @@ class _LoaderState<T> extends State<Loader>{
   T value;
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     if(widget.initialData!=null){
       _initData();

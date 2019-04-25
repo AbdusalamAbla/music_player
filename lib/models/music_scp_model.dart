@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
-import 'package:music_player/model/model.dart';
+import 'package:music_player/models/model.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:scoped_model/scoped_model.dart';
@@ -10,11 +10,11 @@ import 'package:music_player/service/local_data.dart';
 
 enum SongModelAction{START,SEARCHING,FOUNDED,ERROR}
 
-class MusicFileModel extends Model {
+class LocalMusicModel extends Model {
    List<LocalMusic> _songList=[];
    SongModelAction status=SongModelAction.START;
    List<LocalMusic> get songList=>_songList;
-   MusicFileModel(){
+   LocalMusicModel(){
     initSongList();
    }
 

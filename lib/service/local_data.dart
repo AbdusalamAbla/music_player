@@ -1,8 +1,7 @@
 import 'dart:async';
 
 import 'data_base.dart';
-import 'package:music_player/model/model.dart';
-import 'package:music_player/model/playlist_detail.dart';
+import 'package:music_player/models/model.dart';
 import 'package:flutter/foundation.dart';
 
 import 'package:sembast/sembast.dart';

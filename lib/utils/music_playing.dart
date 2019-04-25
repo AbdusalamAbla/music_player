@@ -1,11 +1,11 @@
 import 'dart:async';
 
-// import 'dart:typed_data';
+import 'package:flutter/material.dart';
+
+import 'package:music_player/models/models.dart';
 
 import 'package:audioplayer/audioplayer.dart';
-import 'package:flutter/material.dart';
-// import 'package:http/http.dart';
-import 'package:music_player/model/model.dart';
+
 typedef void OnError(Exception exception);
 
 // const kUrl = "http://www.rxlabz.com/labz/audio2.mp3";

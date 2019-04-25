@@ -1,16 +1,14 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:music_player/model/audio_scp_model.dart';
-import 'package:music_player/model/model.dart';
-import 'package:music_player/model/music_scp_model.dart';
-import 'package:music_player/player/music_player.dart';
+import 'package:music_player/models/models.dart';
+import 'package:music_player/service/music_player.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:draggable_scrollbar/draggable_scrollbar.dart';
 import 'music_page_search.dart';
 
 class LocalMusicPage extends StatefulWidget{
-  final MusicFileModel songModel;
+  final LocalMusicModel songModel;
   final AudioModel audioModel;
   final MusicPlayer musicPlayer;
   LocalMusicPage({@required this.songModel,this.audioModel,this.musicPlayer});
@@ -20,7 +18,7 @@ class LocalMusicPage extends StatefulWidget{
 
 class _LocalMusicPageState extends State<LocalMusicPage> with TickerProviderStateMixin{
  final MusicPlayer musicPlayer;
-  final MusicFileModel songModel;
+  final LocalMusicModel songModel;
   final AudioModel audioModel;
    
   ///////variables/////////////////
@@ -62,7 +60,7 @@ class _LocalMusicPageState extends State<LocalMusicPage> with TickerProviderStat
       ],
       ),
    
-      body: ScopedModel<MusicFileModel>(
+      body: ScopedModel<LocalMusicModel>(
              model: songModel,
              child: getBody(),
            ),
@@ -95,7 +93,7 @@ getBody() {
               );break;
      
     case SongModelAction.FOUNDED: 
-       return ScopedModelDescendant<MusicFileModel>(
+       return ScopedModelDescendant<LocalMusicModel>(
                builder: (context,child,songModel){
                    return DraggableScrollbar.semicircle(
                      backgroundColor: Colors.white,

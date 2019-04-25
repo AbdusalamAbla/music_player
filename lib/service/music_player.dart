@@ -1,8 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:music_player/model/audio_scp_model.dart';
-import 'package:music_player/model/model.dart';
+import 'package:music_player/models/models.dart';
 
 import 'package:audioplayer/audioplayer.dart';
 import 'package:scoped_model/scoped_model.dart';

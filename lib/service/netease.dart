@@ -1,3 +1,10 @@
+/**
+ * 本文件API整理来自 @boyan01(https://github.com/boyan01) 
+ * 项目https://github.com/boyan01/flutter-netease-music
+ * 只用于学习研究，禁止在商业性活动应用
+ */
+
+
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
@@ -6,9 +13,8 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'local_data.dart';
-import 'package:music_player/actor/load_net_data.dart';
-import 'package:music_player/model/model.dart';
-import 'package:music_player/model/playlist_detail.dart';
+import 'package:music_player/utils/loader.dart';
+import 'package:music_player/models/model.dart';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
@@ -79,8 +85,8 @@ class NeteaseRepository {
     _dio.interceptors
       ..add(CookieManager(_cookieJar))
       ..add(InterceptorsWrapper(onRequest: (options) {
-        debugPrint("request header :${options.headers}");
-        debugPrint("request cookie :${options.data}");
+        // debugPrint("request header :${options.headers}");
+        // debugPrint("request cookie :${options.data}");
         return options;
       }));
 
@@ -297,43 +303,43 @@ class NeteaseRepository {
 
   ///edit playlist tracks
   ///true : succeed
-  // Future<bool> playlistTracksEdit(
-  //     PlaylistOperation operation, int playlistId, List<int> musicIds) async {
-  //   assert(operation != null);
-  //   assert(playlistId != null);
-  //   assert(musicIds != null && musicIds.isNotEmpty);
+  Future<bool> playlistTracksEdit(
+      PlaylistOperation operation, int playlistId, List<int> musicIds) async {
+    assert(operation != null);
+    assert(playlistId != null);
+    assert(musicIds != null && musicIds.isNotEmpty);
 
-  //   var result = await doRequest(
-  //       "https://music.163.com/weapi/playlist/manipulate/tracks", {
-  //     "op": operation == PlaylistOperation.add ? "add" : "del",
-  //     "pid": playlistId,
-  //     "trackIds": "[${musicIds.join(",")}]"
-  //   });
-  //   return responseVerify(result).isSuccess;
-  // }
+    var result = await doRequest(
+        "https://music.163.com/weapi/playlist/manipulate/tracks", {
+      "op": operation == PlaylistOperation.add ? "add" : "del",
+      "pid": playlistId,
+      "trackIds": "[${musicIds.join(",")}]"
+    });
+    return responseVerify(result).isSuccess;
+  }
 
   ///update playlist name and description
-//   Future<bool> updatePlaylist(PlaylistDetail playlist) async {
-//     final response = await doRequest(
-//         "https://music.163.com/weapi/batch",
-//         {
-//           "/api/playlist/desc/update": json
-//               .encode({"id": playlist.id, "desc": playlist.description ?? ""}),
-// //          "/api/playlist/tags/update":
-// //              json.encode({"id": playlist.id, "tags": playlist.tags ?? ""}),
-//           "/api/playlist/update/name":
-//               json.encode({"id": playlist.id, "name": playlist.name}),
-//         },
-//         options: Options(headers: {"User-Agent": _chooseUserAgent(ua: "pc")}));
-//     debugPrint("response :$response");
-//     if (!responseVerify(response).isSuccess) {
-//       bool success = response["/api/playlist/desc/update"]["code"] == 200 &&
-// //          response["/api/playlist/tags/update"]["code"] == 200 &&
-//           response["/api/playlist/update/name"]["code"] == 200;
-//       return success;
-//     }
-//     return Future.error(response["msg"] ?? "失败");
-//   }
+  Future<bool> updatePlaylist(PlaylistDetail playlist) async {
+    final response = await doRequest(
+        "https://music.163.com/weapi/batch",
+        {
+          "/api/playlist/desc/update": json
+              .encode({"id": playlist.id, "desc": playlist.description ?? ""}),
+//          "/api/playlist/tags/update":
+//              json.encode({"id": playlist.id, "tags": playlist.tags ?? ""}),
+          "/api/playlist/update/name":
+              json.encode({"id": playlist.id, "name": playlist.name}),
+        },
+        options: Options(headers: {"User-Agent": _chooseUserAgent(ua: "pc")}));
+    debugPrint("response :$response");
+    if (!responseVerify(response).isSuccess) {
+      bool success = response["/api/playlist/desc/update"]["code"] == 200 &&
+//          response["/api/playlist/tags/update"]["code"] == 200 &&
+          response["/api/playlist/update/name"]["code"] == 200;
+      return success;
+    }
+    return Future.error(response["msg"] ?? "失败");
+  }
 
   ///获取歌手信息和单曲
   Future<Map> artistDetail(int artistId) async {

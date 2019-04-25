@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-import 'package:music_player/model/audio_scp_model.dart';
-import 'package:music_player/model/music_scp_model.dart';
-import 'package:music_player/player/music_player.dart';
+import 'models/models.dart';
+import 'service/music_player.dart';
+import 'pages/music_page_search.dart';
+import 'utils/dialogs.dart';
+import 'main_local.dart';
+import 'main_netease.dart';
+import 'routes.dart';
 
-import 'package:music_player/main/main_cloud.dart';
-import 'package:music_player/main/main_local.dart';
-import 'package:music_player/localmusic/music_page_search.dart';
-import 'package:music_player/routes.dart';
 class HomePage extends StatefulWidget{
   @override
   _HomePageState createState()=>_HomePageState();
@@ -17,7 +17,7 @@ class HomePage extends StatefulWidget{
 class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin{
   
   //////////////////
-  final MusicFileModel songModel=MusicFileModel();
+  final LocalMusicModel songModel=LocalMusicModel();
   final AudioModel audioModel=AudioModel();
   MusicPlayer musicPlayer;
    int _lastIntegerSelected;
@@ -144,7 +144,47 @@ return musicPlayer;
 class _AppDrawerHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    if (UserAccount.of(context).isLogin) {
+      return _buildHeader(context);
+    } else {
       return _buildHeaderNotLogin(context);
+    }
+  }
+  
+  Widget _buildHeader(BuildContext context) {
+    Map profile = UserAccount.of(context).user["profile"];
+    return UserAccountsDrawerHeader(
+      currentAccountPicture: InkResponse(
+        onTap: () {
+          if (UserAccount.of(context).isLogin) {
+            // debugPrint("work in process...");
+          }
+        },
+        child: CircleAvatar(
+          
+        ),
+      ),
+      accountName: Text(profile["nickname"]),
+      accountEmail: null,
+      otherAccountsPictures: [
+        Material(
+          color: Colors.transparent,
+          child: IconButton(
+            icon: Icon(
+              Icons.exit_to_app,
+              color: Theme.of(context).primaryIconTheme.color,
+            ),
+            tooltip: "退出登陆",
+            onPressed: () async {
+              if (await showConfirmDialog(context, Text('确认退出登录吗？'),
+                  positiveLabel: '退出登录')) {
+                UserAccount.of(context, rebuildOnChange: false).logout();
+              }
+            },
+          ),
+        )
+      ],
+    );
   }
 
   Widget _buildHeaderNotLogin(BuildContext context) {
@@ -175,7 +215,7 @@ class _AppDrawerHeader extends StatelessWidget {
                     padding: EdgeInsets.symmetric(horizontal: 30),
                     onPressed: () {
                       // Navigator.pushNamed(context, ROUTE_LOGIN);
-                      print('login');
+                      Navigator.pushNamed(context, ROUTE_LOGIN);
                     },
                     child: Text("立即登陆"))
               ],
