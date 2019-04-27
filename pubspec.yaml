@@ -35,7 +35,8 @@ dependencies:
   draggable_scrollbar: ^0.0.4
   crypto: ^2.0.6
   cookie_jar: ^1.0.0
-
+  url_launcher: ^5.0.2
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter

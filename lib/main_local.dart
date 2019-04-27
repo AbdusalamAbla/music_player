@@ -8,20 +8,19 @@ import 'service/netease_image.dart';
 import 'service/local_data.dart';
 import 'service/netease.dart';
 import 'models/models.dart';
-
+import 'pages/detail_page.dart';
 import 'package:overlay_support/overlay_support.dart';
 
 class MainLocalPage extends StatefulWidget{
-  final LocalMusicModel songModel;
-  final AudioModel audioModel;
-  MainLocalPage(this.songModel,this.audioModel);
+  
+  MainLocalPage();
 @override
-_MainLocalPageState createState()=>_MainLocalPageState(songModel,audioModel);
+_MainLocalPageState createState()=>_MainLocalPageState();
 }
 class _MainLocalPageState extends State<MainLocalPage> with AutomaticKeepAliveClientMixin{
-  final LocalMusicModel songModel;
-  final AudioModel audioModel;
-  _MainLocalPageState(this.songModel,this.audioModel);
+  
+ 
+  _MainLocalPageState();
    GlobalKey<RefreshIndicatorState> _indicatorKey = GlobalKey();
 
   GlobalKey<LoaderState> _loaderKey = GlobalKey();
@@ -32,7 +31,7 @@ class _MainLocalPageState extends State<MainLocalPage> with AutomaticKeepAliveCl
      Widget widget;
     
     if (!UserAccount.of(context).isLogin) {
-      widget = _PinnedHeader(songModel,audioModel);
+      widget = _PinnedHeader();
     } else {
       widget = RefreshIndicator(
         key: _indicatorKey,
@@ -48,12 +47,12 @@ class _MainLocalPageState extends State<MainLocalPage> with AutomaticKeepAliveCl
             loadingBuilder: (context) {
               _indicatorKey.currentState.show();
               return ListView(children: [
-                _PinnedHeader(songModel,audioModel),
+                _PinnedHeader(),
               ]);
             },
             failedWidgetBuilder: (context, result, msg) {
               return ListView(children: [
-                _PinnedHeader(songModel,audioModel),
+                _PinnedHeader(),
                 Loader.buildSimpleFailedWidget(context, result, msg),
               ]);
             },
@@ -63,7 +62,7 @@ class _MainLocalPageState extends State<MainLocalPage> with AutomaticKeepAliveCl
               final subscribed =
                   result.where((p) => p.creator["userId"] != userId).toList();
               return ListView(children: [
-                _PinnedHeader(songModel,audioModel),
+                _PinnedHeader(),
                 _ExpansionPlaylistGroup.fromPlaylist(
                   "创建的歌单",
                   created,
@@ -94,11 +93,11 @@ class _MainLocalPageState extends State<MainLocalPage> with AutomaticKeepAliveCl
 }
 
 class _PinnedHeader extends StatelessWidget {
-  final LocalMusicModel songModel;
-  final AudioModel  audioModel;
-  _PinnedHeader(this.songModel,this.audioModel);
+  
   @override
   Widget build(BuildContext context) {
+    final  songList=LocalMusicModel.of(context).songList;
+    // final audioModel=AudioModel.of(context);
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
@@ -112,26 +111,26 @@ class _PinnedHeader extends StatelessWidget {
                       Navigator.pushNamed(context, "/login");
                     }),
               ),
-        // DividerWrapper(
-        //     indent: 16,
-        //     child: ListTile(
-        //       leading: Icon(
-        //         Icons.schedule,
-        //         color: Theme.of(context).primaryColor,
-        //       ),
-        //       title: Text('播放记录'),
-        //       onTap: () {
-        //         if (UserAccount.of(context, rebuildOnChange: false).isLogin) {
-        //           Navigator.push(context, MaterialPageRoute(builder: (context) {
-        //             return RecordPage(
-        //                 uid: UserAccount.of(context, rebuildOnChange: false)
-        //                     .userId);
-        //           }));
-        //         } else {
-        //           //todo show login dialog
-        //         }
-        //       },
-        //     )),
+        DividerWrapper(
+            indent: 16,
+            child: ListTile(
+              leading: Icon(
+                Icons.schedule,
+                color: Theme.of(context).accentColor,
+              ),
+              title: Text('播放记录'),
+              onTap: () {
+                // if (UserAccount.of(context, rebuildOnChange: false).isLogin) {
+                //   Navigator.push(context, MaterialPageRoute(builder: (context) {
+                //     return RecordPage(
+                //         uid: UserAccount.of(context, rebuildOnChange: false)
+                //             .userId);
+                //   }));
+                // } else {
+                //   //todo show login dialog
+                // }
+              },
+            )),
         DividerWrapper(
             indent: 16,
             child: ListTile(
@@ -144,11 +143,11 @@ class _PinnedHeader extends StatelessWidget {
                 TextSpan(
                     style: const TextStyle(fontSize: 13, color: Colors.grey),
                     text:
-                        '  ${songModel.songList.length>0?songModel.songList.length:''}'),
+                        '  ${songList.length>0?songList.length:''}'),
               ])),
               onTap: () {
                 Navigator.push(context, new MaterialPageRoute(
-            builder: (context)=>new LocalMusicPage(songModel: songModel,audioModel: audioModel,)
+            builder: (context)=>new LocalMusicPage()
           ));
               },
             )),
@@ -340,12 +339,12 @@ class _ItemPlaylist extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        // Navigator.push(
-        //     context,
-        //     MaterialPageRoute(
-        //         builder: (context) =>
-        //             PlaylistDetailPage(playlist.id, playlist: playlist)));
-        print('u pressed this.');
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    ListDetail(playlist: playlist,playlistId: playlist.id)));
+        print('u pressed this.${playlist.id}');
       },
       child: Container(
         height: 60,

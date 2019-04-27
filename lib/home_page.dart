@@ -7,6 +7,7 @@ import 'utils/dialogs.dart';
 import 'main_local.dart';
 import 'main_netease.dart';
 import 'routes.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomePage extends StatefulWidget{
   @override
@@ -17,8 +18,6 @@ class HomePage extends StatefulWidget{
 class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin{
   
   //////////////////
-  final LocalMusicModel songModel=LocalMusicModel();
-  final AudioModel audioModel=AudioModel();
   MusicPlayer musicPlayer;
    int _lastIntegerSelected;
    final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -32,13 +31,14 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   void initState() {
     super.initState();
     // songModel.getSongListfromLocal();
-    audioModel.initAudioPlayer();
     _tabController=TabController(vsync: this,length: 2);
-    musicPlayer=new MusicPlayer(audioModel,audioModel.currentIndex);
+
   }
   
   @override
   Widget build(BuildContext context) {
+    final AudioModel audioModel=AudioModel.of(context);
+        musicPlayer=new MusicPlayer(audioModel);
     return Scaffold(
       key: _scaffoldKey,
       drawer:Drawer(
@@ -66,9 +66,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                             leading: Icon(Icons.format_quote),
                             title: Text("关于开发人员"),
                             onTap: () {
-                              // launch(
-                              //     "https://github.com/boyan01/quiet-flutter");
-                              print('github');
+                              launch(
+                                  "https://github.com/AbdusalamAbla");
                             },
                           ),
                         ],
@@ -125,13 +124,14 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       ),
       body: TabBarView(
           controller: _tabController,
-          children: <Widget>[MainLocalPage(songModel,audioModel), MainCloudPage()],
+          children: <Widget>[MainLocalPage(), MainCloudPage()],
         ),
       bottomNavigationBar: initBottomBar(),
       );
   }
 
 initBottomBar(){
+  final AudioModel audioModel=AudioModel.of(context);
   if (audioModel.songList.length<1) {
     return null;
   }else{

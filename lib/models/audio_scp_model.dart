@@ -6,6 +6,11 @@ import 'package:flutter/material.dart';
 
 class AudioModel extends Model{
   
+
+  static AudioModel of(BuildContext context, {bool rebuildOnChange = true}) {
+    return ScopedModel.of<AudioModel>(context,
+        rebuildOnChange: rebuildOnChange);
+  }
   AudioModel(){
     initAudioPlayer();
     

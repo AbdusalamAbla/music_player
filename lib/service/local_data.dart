@@ -108,5 +108,10 @@ FutureOr operator [](key) async {
     assert(playlistDetail.loaded);
     return _put(playlistDetail.toMap(), 'playlist_detail_${playlistDetail.id}');
   }
+//* 获得用户网络歌单内容
+  Future<PlaylistDetail> getPlaylistDetail(int playlistId) async {
+    final data = await get("playlist_detail_$playlistId");
+    return PlaylistDetail.fromMap(data);
+  }
 
 }

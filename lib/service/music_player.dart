@@ -7,21 +7,20 @@ import 'package:audioplayer/audioplayer.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 class MusicPlayer extends StatefulWidget{
-  MusicPlayer(this.audioModel,this._currentIndex);
- final AudioModel audioModel;
-final int _currentIndex;
+  MusicPlayer(this.audioModel);
+final AudioModel  audioModel;
 @override 
-_MusicPlayerState createState()=>_MusicPlayerState(audioModel,this._currentIndex);
+_MusicPlayerState createState()=>_MusicPlayerState(audioModel);
 }
 class _MusicPlayerState extends State<MusicPlayer> with TickerProviderStateMixin{
 
 
 
-_MusicPlayerState(this._audioModel,this._currentIndex);
+_MusicPlayerState(this.audioModel);
   //////////////////variables/////////////
-final AudioModel _audioModel;
+
   String localFilePath;
-  int _currentIndex;
+  final AudioModel  audioModel;
   // bool isPlaying;
   AudioPlayer audioPlayer;
   Duration duration;
@@ -52,8 +51,7 @@ final AudioModel _audioModel;
     super.dispose();
   }
   initPD(){
-      
-     audioPlayer=_audioModel.audioPlayer; 
+     audioPlayer=audioModel.audioPlayer; 
      
      duration=audioPlayer.duration;
    _positionSubscription = audioPlayer.onAudioPositionChanged
@@ -63,7 +61,7 @@ final AudioModel _audioModel;
       if (s == AudioPlayerState.PLAYING) {
         setState(() => duration = audioPlayer.duration);
       } else if (s == AudioPlayerState.STOPPED) {
-        _audioModel.onComplete();
+        audioModel.onComplete();
         setState(() {
           position = new Duration();
         });
@@ -71,7 +69,7 @@ final AudioModel _audioModel;
     }, onError: (msg) {
       setState(() {
         
-        _audioModel.isPlaying=false;
+        audioModel.isPlaying=false;
         duration = new Duration(seconds: 0);
         position = new Duration(seconds: 0);
       });
@@ -82,17 +80,18 @@ final AudioModel _audioModel;
   
   @override
   Widget build(BuildContext context) {
+    final AudioModel _audioModel=AudioModel.of(context);
     //  if (!isControllerInit) {
        
     //  }
      setState(() {
-      _audioModel.controller.index=_audioModel.currentIndex; 
+      audioModel.controller.index=_audioModel.currentIndex; 
      });
       //  isPlaying=_audioModel.isPlaying;
        
        
     return ScopedModel<AudioModel>(
-         model: _audioModel,
+         model: audioModel,
          child: BottomAppBar(
              child: Container(
               height: 110,
@@ -140,8 +139,8 @@ final AudioModel _audioModel;
                 height: 80,
                 child: 
                   TabBarView(
-               controller: _audioModel.controller,
-               children: _audioModel.songList.map<Widget>((LocalMusic music){
+               controller: audioModel.controller,
+               children: audioModel.songList.map<Widget>((LocalMusic music){
                 return Column(
            children: <Widget>[
               Text(  '${music.title}' ,style: new TextStyle(fontSize: 18), softWrap:false,overflow: TextOverflow.fade,),
@@ -160,15 +159,15 @@ final AudioModel _audioModel;
               child: Row(
                 children: <Widget>[
                 IconButton(
-                    icon: _audioModel.isPlaying?Icon(Icons.pause):Icon(Icons.play_arrow),
+                    icon: audioModel.isPlaying?Icon(Icons.pause):Icon(Icons.play_arrow),
                      onPressed: (){
-                       if (_audioModel.isPlaying) {
+                       if (audioModel.isPlaying) {
                          _audioModel.pause();
                        } else {
-                         _audioModel.play();
+                         audioModel.play();
                        }
                        setState(() {
-                         _audioModel.isPlaying?_audioModel.isPlaying=false:_audioModel.isPlaying=true;
+                         audioModel.isPlaying?audioModel.isPlaying=false:audioModel.isPlaying=true;
                          });
                      },
                ),

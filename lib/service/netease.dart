@@ -145,7 +145,7 @@ class NeteaseRepository {
     }
     return null;
   }
-
+  
   // ///create new playlist by [name]
   Future<PlaylistDetail> createPlaylist(String name) async {
     final response = await doRequest(

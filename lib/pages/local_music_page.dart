@@ -8,31 +8,26 @@ import 'package:draggable_scrollbar/draggable_scrollbar.dart';
 import 'music_page_search.dart';
 
 class LocalMusicPage extends StatefulWidget{
-  final LocalMusicModel songModel;
-  final AudioModel audioModel;
-  final MusicPlayer musicPlayer;
-  LocalMusicPage({@required this.songModel,this.audioModel,this.musicPlayer});
+  
   @override
-  _LocalMusicPageState createState()=>_LocalMusicPageState(songModel: songModel,audioModel: audioModel);
+  _LocalMusicPageState createState()=>_LocalMusicPageState();
 }
 
 class _LocalMusicPageState extends State<LocalMusicPage> with TickerProviderStateMixin{
- final MusicPlayer musicPlayer;
-  final LocalMusicModel songModel;
-  final AudioModel audioModel;
-   
+
   ///////variables/////////////////
   List<LocalMusic> _songList=[];
   ScrollController controller = ScrollController();
   int _lastIntegerSelected;
   String localFilePath;
   
-  _LocalMusicPageState({@required this.songModel,this.audioModel,this.musicPlayer});
+  _LocalMusicPageState();
   /////////////////////////
   @override
   Widget build(BuildContext context) {
 
-    _songList=songModel.songList;
+    _songList=LocalMusicModel.of(context).songList;
+    final AudioModel audioModel=AudioModel.of(context);
     audioModel.controller=TabController(vsync: this,length: audioModel.songList.length);
 
     return Scaffold(
@@ -60,17 +55,17 @@ class _LocalMusicPageState extends State<LocalMusicPage> with TickerProviderStat
       ],
       ),
    
-      body: ScopedModel<LocalMusicModel>(
-             model: songModel,
-             child: getBody(),
-           ),
-      bottomNavigationBar: audioModel.songList.length<1?null:MusicPlayer(audioModel,audioModel.currentIndex),
+      body: getBody(),
+           
+      bottomNavigationBar: audioModel.songList.length<1?null:MusicPlayer(audioModel),
     );
   }
 
 
 
 getBody() {
+  final songModel=LocalMusicModel.of(context);
+  final AudioModel audioModel=AudioModel.of(context);
   switch (songModel.status) {
     case SongModelAction.ERROR:
          return new Center(
