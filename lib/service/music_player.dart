@@ -40,7 +40,7 @@ _MusicPlayerState(this.audioModel);
     super.initState();
     initPD();
     
-      //  isControllerInit=true;
+
      
   }
   @override
@@ -80,15 +80,14 @@ _MusicPlayerState(this.audioModel);
   
   @override
   Widget build(BuildContext context) {
-    final AudioModel _audioModel=AudioModel.of(context);
     //  if (!isControllerInit) {
        
     //  }
      setState(() {
-      audioModel.controller.index=_audioModel.currentIndex; 
+      audioModel.controller.index=audioModel.currentIndex; 
      });
       //  isPlaying=_audioModel.isPlaying;
-       
+       print('zheshi '+duration.toString());
        
     return ScopedModel<AudioModel>(
          model: audioModel,
@@ -106,15 +105,7 @@ _MusicPlayerState(this.audioModel);
                  mainAxisAlignment: MainAxisAlignment.center,
                  children: <Widget>[
                   Text(  '${positionText??''}',style: new TextStyle(fontSize: 12),),
-                  duration == null? new Slider(
-                    value:  0.0,
-                    onChanged: (double value) =>
-                    audioPlayer.seek((value / 1000).roundToDouble()),
-                    min: 0.0,
-                    activeColor: Colors.blue,
-                    inactiveColor: Colors.grey,
-                    max: 100
-                  )
+                  duration == null? new Container()
                   : new Slider(
                     value: position?.inMilliseconds?.toDouble() ?? 0.0,
                     onChanged: (double value) =>
@@ -122,7 +113,7 @@ _MusicPlayerState(this.audioModel);
                     min: 0.0,
                     activeColor: Colors.blue,
                     inactiveColor: Colors.grey,
-                    max: duration.inMilliseconds.toDouble()
+                    max: (duration.inSeconds<0)&&(duration.inMinutes<0)?0:duration.inMilliseconds.toDouble()
                   ),
                   Text('${durationText ??''}',style: new TextStyle(fontSize: 12),),
                 ],
@@ -140,11 +131,11 @@ _MusicPlayerState(this.audioModel);
                 child: 
                   TabBarView(
                controller: audioModel.controller,
-               children: audioModel.songList.map<Widget>((LocalMusic music){
+               children: audioModel.songList.map<Widget>((Music music){
                 return Column(
            children: <Widget>[
               Text(  '${music.title}' ,style: new TextStyle(fontSize: 18), softWrap:false,overflow: TextOverflow.fade,),
-             Text('${music.artist}',style: new TextStyle(color: Colors.grey),softWrap: false,),
+             Text('${music.artist[0].name}',style: new TextStyle(color: Colors.grey),softWrap: false,),
             
            ],
          );
@@ -162,7 +153,7 @@ _MusicPlayerState(this.audioModel);
                     icon: audioModel.isPlaying?Icon(Icons.pause):Icon(Icons.play_arrow),
                      onPressed: (){
                        if (audioModel.isPlaying) {
-                         _audioModel.pause();
+                         audioModel.pause();
                        } else {
                          audioModel.play();
                        }

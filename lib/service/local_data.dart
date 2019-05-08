@@ -71,21 +71,21 @@ FutureOr operator [](key) async {
     return (await store).put(value, key);
   }
   //*  获得本地歌曲列表
-  Future<List<LocalMusic>> getLocalMusicList() async {
+  Future<List<Music>> getLocalMusicList() async {
     final data = await get("localmusiclist");
     if (data == null) {
       return [];
     }
     final result = (data as List)
         .cast<Map>()
-        .map((m) => LocalMusic.fromJson(m))
+        .map((m) => Music.fromMap(m))
         .toList();
     return result;
   }
 
   //* 更新本地歌曲列表
-  void updateLocalMusicList(List<LocalMusic> list) {
-    _put(list.map((p) => p.toJson()).toList(), "localmusiclist");
+  void updateLocalMusicList(List<Music> list) {
+    _put(list.map((p) => p.toMap()).toList(), "localmusiclist");
   }
   //*  获得用户网络歌单
   Future<List<PlaylistDetail>> getUserNetMusicList(int userId) async {
@@ -105,7 +105,7 @@ FutureOr operator [](key) async {
   }
   //*  存储歌单
   Future updatePlaylistDetail(PlaylistDetail playlistDetail) {
-    assert(playlistDetail.loaded);
+    // assert(playlistDetail.loaded);
     return _put(playlistDetail.toMap(), 'playlist_detail_${playlistDetail.id}');
   }
 //* 获得用户网络歌单内容

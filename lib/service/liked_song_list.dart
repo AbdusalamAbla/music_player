@@ -37,20 +37,19 @@ class LikedSongList extends Model {
   List<int> _ids = const [];
 
   List<int> get ids => _ids;
-
+   
   static LikedSongList of(BuildContext context,
       {bool rebuildOnChange = false}) {
     return ScopedModel.of<LikedSongList>(context,
         rebuildOnChange: rebuildOnChange);
   }
 
-  static bool contain(BuildContext context, NetMusic music) {
+  static bool contain(BuildContext context, Music music) {
     final list = ScopedModel.of<LikedSongList>(context, rebuildOnChange: true);
     return list.ids?.contains(music.id) == true;
   }
-
   ///红心歌曲
-  Future<void> likeMusic(NetMusic music) async {
+  Future<void> likeMusic(Music music) async {
     final succeed = await neteaseRepository.like(music.id, true);
     if (succeed) {
       _ids = List.from(_ids)..add(music.id);
@@ -59,7 +58,7 @@ class LikedSongList extends Model {
   }
 
   ///取消红心歌曲
-  Future<void> dislikeMusic(NetMusic music) async {
+  Future<void> dislikeMusic(Music music) async {
     final succeed = await neteaseRepository.like(music.id, false);
     if (succeed) {
       _ids = List.from(_ids)..remove(music.id);

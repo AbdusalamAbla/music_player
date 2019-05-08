@@ -2,38 +2,40 @@
 
 import 'package:flutter/material.dart';
 import 'package:music_player/models/models.dart';
+import 'package:music_player/service/music_player.dart';
 import 'package:music_player/utils/loader.dart';
 import 'package:music_player/service/local_data.dart';
 import 'package:music_player/service/netease.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:music_player/service/netease_image.dart';
 class ListDetail extends StatefulWidget {
- ListDetail({Key key,this.playlistId,this.playlist}) : super(key: key);
+ ListDetail({Key key,this.playlist}) : super(key: key);
   ///playlist id，can not be null
-  final int playlistId;
 
   ///a simple playlist json obj , can be null
   ///used to preview playlist information when loading
   final PlaylistDetail playlist;
-  _ListDetailState createState() => _ListDetailState(playlist: playlist,playlistId: playlistId);
+  _ListDetailState createState() => _ListDetailState(playlist: playlist);
 }
 
-class _ListDetailState extends State<ListDetail> {
+class _ListDetailState extends State<ListDetail> with TickerProviderStateMixin {
 
 
-  _ListDetailState({this.playlistId,this.playlist});
-   final int playlistId;
+  _ListDetailState({this.playlist});
 
   ///a simple playlist json obj , can be null
   ///used to preview playlist information when loading
   final PlaylistDetail playlist;
   @override
   Widget build(BuildContext context) {
+    AudioModel audioModel=AudioModel.of(context);
+    audioModel.controller=TabController(vsync: this,length: audioModel.songList.length);
     return Scaffold(
       appBar: AppBar(
         title: Text(playlist.name),
       ),
-     body: _ListBody(playlist)
+     body: _ListBody(playlist),
+     bottomNavigationBar: audioModel.songList.length<1?null:new MusicPlayer(audioModel),
     );
   }
 
@@ -72,7 +74,7 @@ class _ListBody extends StatefulWidget {
 
   final PlaylistDetail playlist;
 
-   List<NetMusic> get musicList => playlist.musicList;
+   List<Music> get musicList => playlist.musicList;
 
   _ListBodyState createState() => _ListBodyState(playlist);
 }
@@ -83,6 +85,7 @@ class _ListBodyState extends State<_ListBody> {
   _ListBodyState(this.playlist);
   @override
   Widget build(BuildContext context) {
+    AudioModel audioModel =AudioModel.of(context);
     return Loader(
             initialData: myData.getPlaylistDetail(playlist.id),
             loadTask: () => neteaseRepository.playlistDetail(playlist.id),
@@ -101,7 +104,7 @@ class _ListBodyState extends State<_ListBody> {
             },
             builder: (context, result) {
               final PlaylistDetail playlist=result;
-              List<NetMusic> musicList=playlist.musicList;
+              List<Music> musicList=playlist.musicList;
               return ListView.builder(
                 controller: controller,
                 itemExtent: 80,
@@ -111,7 +114,11 @@ class _ListBodyState extends State<_ListBody> {
                                       children: <Widget>[
                                         ListTile(
                                           onTap: (){
-                                            print('you pressed ${musicList[index].title}');
+                                           setState(() {
+                                          audioModel.songList=musicList; 
+                                         });
+                                       audioModel.changeIndex(index); 
+                                       audioModel.play();
                                           },
                                           title: Row(
                                                   children: <Widget>[
@@ -299,7 +306,7 @@ class _PlaylistDetailHeader extends StatelessWidget {
 
   ///the music list
   ///could be null if music list if not loaded
-  List<NetMusic> get musicList => playlist.musicList;
+  List<Music> get musicList => playlist.musicList;
 
   @override
   Widget build(BuildContext context) {

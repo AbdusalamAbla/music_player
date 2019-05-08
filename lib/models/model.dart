@@ -7,120 +7,150 @@ abstract class ModelBase {
    String type;
       int id;
   String title;
-  String artist;
   String path;
-  String modify;
   String size;
 }
 
-class LocalMusic extends ModelBase {
+class Music extends ModelBase {
   
-  LocalMusic({this.id,this.title,this.artist,this.path,this.modify,this.size}){
+  Music({this.id,
+         this.title,
+         this.artist,
+         Album album,
+          String url,
+          String path,
+         String size,
+         int mvId
+}){
    type='music';
+   this.album=album??new Album(name: 'Not None');
+   this.mvId=mvId??0;
+   this.url=url??'';
+   this.path=path??'';
   }
  final int id;
  final String title;
- final String artist;
- final String path;
- final String modify;
- final String size;
-
-  @override
-  String toString() {
-    return 'LocalMusic{id: $id, title: $title, artist:$artist, path:$path,size:$size}';
-  }
-
- factory LocalMusic.fromJson(Map<String,dynamic> json){
-   return LocalMusic(
-      id: json['id'] as int,
-      title: json['title'] as String,
-      artist: json['artist']as String,
-      path: json['path'] as String,
-      modify: json['modify'] as String,
-      size: json['size'] as String);
- }
-
- Map<String,dynamic> toJson(){
-    return <String, dynamic>{
-      'id': id,
-      'title': title,
-      'artist':artist,
-      'path': path,
-      'modify': modify,
-      'size': size
-    };
- }
-}
-
-
-
-
-
-class NetMusic {
- 
-NetMusic({
-    this.id,
-    this.title,
-    this.url, 
-    this.album, 
-    this.artist,
-    int mvId
-}): this.mvId = mvId ?? 0;
-
- final int id;
- final String title;
- final String url;
- final Album album;
  final List<Artist> artist;
- final int mvId;///歌曲mv id,当其为0时,表示没有mv
+ String url;
+ String path;
+ Album album;
+ String size;
+ int mvId;
+  
+  @override
+  int get hashCode => id.hashCode;
 
- String get subTitle {
+
+  String get subTitle {
     var ar = artist.map((a) => a.name).join('/');
     var al = album.name;
     return "$al - $ar";
   }
 
   @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is NetMusic && runtimeType == other.runtimeType && id == other.id;
-
-  @override
-  int get hashCode => id.hashCode;
-
-  @override
   String toString() {
-    return 'Music{id: $id, title: $title, url: $url, album: $album, artist: $artist}';
+    return 'Music{id: $id, title: $title, artist:$artist, path:$path,size:$size}';
   }
 
-  static NetMusic fromMap(Map map) {
-    if (map == null) {
+ factory Music.fromMap(Map<String,dynamic> map){
+   if (map == null) {
       return null;
     }
-    return NetMusic(
-        id: map["id"],
-        title: map["title"],
-        url: map["url"],
-        album: Album.fromMap(map["album"]),
-        mvId: map['mvId'] ?? 0,
-        artist:(map["artist"] as List)
+   return Music(
+      id: map['id'] as int,
+      title: map['title'] as String,
+      artist: (map["artist"] as List)
                .cast<Map>()
                .map(Artist.fromMap)
-               .toList());
-  }
+               .toList(),
+      album: Album.fromMap(map["album"]),
+      path: map['path'] as String,
+      size: map['size'] as String);
+ }
 
-  Map toMap() {
-    return {
-      "id": this.id,
-      "title": this.title,
-      "url": this.url,
+ Map<String,dynamic> toMap(){
+    return <String, dynamic>{
+      'id': id,
+      'title': title,
+      'artist':artist.map((e) => e.toMap()).toList(),
       "subTitle": this.subTitle,
-      'mvId': this.mvId,
-      "album": this.album.toMap(),
-      "artist": this.artist.map((e) => e.toMap()).toList()
+      'url':url,
+      'path': path,
+      'album':album.toMap(),
+      'size': size,
     };
-  }
-  }
+ }
+}
+
+
+
+
+
+// class NetMusic {
+ 
+// NetMusic({
+//     this.id,
+//     this.title,
+//     this.url, 
+//     this.album, 
+//     this.artist,
+//     int mvId
+// }): this.mvId = mvId ?? 0;
+
+//  final int id;
+//  final String title;
+//  final String url;
+//  final Album album;
+//  final List<Artist> artist;
+//  final int mvId;///歌曲mv id,当其为0时,表示没有mv
+
+//  String get subTitle {
+//     var ar = artist.map((a) => a.name).join('/');
+//     var al = album.name;
+//     return "$al - $ar";
+//   }
+
+//   @override
+//   bool operator ==(Object other) =>
+//       identical(this, other) ||
+//       other is NetMusic && runtimeType == other.runtimeType && id == other.id;
+
+//   @override
+//   int get hashCode => id.hashCode;
+
+//   @override
+//   String toString() {
+//     return 'Music{id: $id, title: $title, url: $url, album: $album, artist: $artist}';
+//   }
+
+//   static NetMusic fromMap(Map map) {
+//     if (map == null) {
+//       return null;
+//     }
+//     return NetMusic(
+//         id: map["id"],
+//         title: map["title"],
+//         url: map["url"],
+//         album: Album.fromMap(map["album"]),
+//         mvId: map['mvId'] ?? 0,
+//         artist:(map["artist"] as List)
+//                .cast<Map>()
+//                .map(Artist.fromMap)
+//                .toList());
+//   }
+
+//   Map toMap() {
+//     return {
+//       "id": this.id,
+//       "title": this.title,
+//       "url": this.url,
+//       "subTitle": this.subTitle,
+//       'mvId': this.mvId,
+//       "album": this.album.toMap(),
+//       "artist": this.artist.map((e) => e.toMap()).toList()
+//     };
+//   }
+//   }
 
 
 class Album {
@@ -194,7 +224,7 @@ class PlaylistDetail {
       this.playCount);
 
   ///null when playlist not complete loaded
-  final List<NetMusic> musicList;
+  final List<Music> musicList;
 
   String name;
 
@@ -252,7 +282,7 @@ class PlaylistDetail {
         map['id'],
         (map['musicList'] as List)
             ?.cast<Map>()
-            ?.map((m) => NetMusic.fromMap(m))
+            ?.map((m) => Music.fromMap(m))
             ?.toList(),
         map['creator'],
         map['name'],

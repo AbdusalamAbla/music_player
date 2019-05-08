@@ -143,7 +143,7 @@ class _PinnedHeader extends StatelessWidget {
                 TextSpan(
                     style: const TextStyle(fontSize: 13, color: Colors.grey),
                     text:
-                        '  ${songList.length>0?songList.length:''}'),
+                        '  ${songList.length>0?songList.length:'0'}首'),
               ])),
               onTap: () {
                 Navigator.push(context, new MaterialPageRoute(
@@ -343,7 +343,7 @@ class _ItemPlaylist extends StatelessWidget {
             context,
             MaterialPageRoute(
                 builder: (context) =>
-                    ListDetail(playlist: playlist,playlistId: playlist.id)));
+                    ListDetail(playlist: playlist)));
         print('u pressed this.${playlist.id}');
       },
       child: Container(

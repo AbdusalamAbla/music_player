@@ -16,7 +16,7 @@ class LocalMusicPage extends StatefulWidget{
 class _LocalMusicPageState extends State<LocalMusicPage> with TickerProviderStateMixin{
 
   ///////variables/////////////////
-  List<LocalMusic> _songList=[];
+  List<Music> _songList=[];
   ScrollController controller = ScrollController();
   int _lastIntegerSelected;
   String localFilePath;
@@ -108,8 +108,9 @@ getBody() {
                                          setState(() {
                                           audioModel.songList=_songList; 
                                          });
-                                       audioModel.changeIndex(_songList[index].id-1); 
+                                       audioModel.changeIndex(index); 
                                        audioModel.play();
+                                       print(_songList[index].path);
                                 },
                               title: Row(
                                      children: <Widget>[
@@ -118,7 +119,7 @@ getBody() {
                                       ],
                               ),
                               subtitle:  Text(
-                                          '${_songList[index].artist}',
+                                          '${_songList[index].artist[0].name}',
                                           style: TextStyle(fontSize: 12.0),
                                          ),
                               trailing:  null ,

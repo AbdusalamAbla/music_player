@@ -572,7 +572,7 @@ String _chooseUserAgent({String ua}) {
   return _USER_AGENT_LIST[index];
 }
 
-NetMusic mapJsonToMusic(Map song,
+Music mapJsonToMusic(Map song,
     {String artistKey = "artists", String albumKey = "album"}) {
   Map album = song[albumKey] as Map;
 
@@ -583,7 +583,7 @@ NetMusic mapJsonToMusic(Map song,
     );
   }).toList();
 
-  return NetMusic(
+  return Music(
       id: song["id"],
       title: song["name"],
       mvId: song['mv'] ?? 0,
@@ -593,7 +593,7 @@ NetMusic mapJsonToMusic(Map song,
       artist: artists);
 }
 
-List<NetMusic> mapJsonListToMusicList(List tracks,
+List<Music> mapJsonListToMusicList(List tracks,
     {String artistKey = "artists", String albumKey = "album"}) {
   if (tracks == null) {
     return null;

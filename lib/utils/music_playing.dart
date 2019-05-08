@@ -14,7 +14,7 @@ enum PlayerState { stopped, playing, paused }
 
 class MusicPlay extends StatefulWidget {
   
-  final LocalMusic music;
+  final Music music;
   MusicPlay({this.music});
   @override
   _MusicPlayState createState() => new _MusicPlayState(music: music);
@@ -23,7 +23,7 @@ class MusicPlay extends StatefulWidget {
 class _MusicPlayState extends State<MusicPlay> {
   _MusicPlayState({this.music});
  
- final LocalMusic music;
+ final Music music;
   Duration duration;
   Duration position;
  

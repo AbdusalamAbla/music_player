@@ -13,9 +13,9 @@ enum SongModelAction{START,SEARCHING,FOUNDED,ERROR}
 
 class LocalMusicModel extends Model {
    
-   List<LocalMusic> _songList=[];
+   List<Music> _songList=[];
    SongModelAction status=SongModelAction.START;
-   List<LocalMusic> get songList=>_songList;
+   List<Music> get songList=>_songList;
 
    static LocalMusicModel of(BuildContext context,{bool rebuildOnchange=true}){
      return ScopedModel.of<LocalMusicModel>(context,rebuildOnChange: rebuildOnchange);
@@ -55,11 +55,11 @@ class LocalMusicModel extends Model {
      
 }
   
-  static List<LocalMusic> _findFileInDir(String path){
+  static List<Music> _findFileInDir(String path){
 
     List<FileSystemEntity> fileList=[];
     List<FileSystemEntity> songFileList=[];
-    List<LocalMusic>  songList=[];
+    List<Music>  songList=[];
       Directory directory=Directory(path);
      fileList.addAll(directory.listSync());
      for (int index=0;index<fileList.length;index++) {
@@ -96,12 +96,13 @@ class LocalMusicModel extends Model {
         String totalName=songFileList[i].path.substring(songFileList[i].parent.path.length + 1);
          var k1=totalName.split(' - ');
          var k2=k1[1].split('.');
-        songList.add(new LocalMusic(
+         List<Artist> artist=[new Artist(name: k1[0])];
+         
+        songList.add(new Music(
           id: i+1,
           title:k2[0],
-          artist: k1[0],
+          artist: artist,
           path: songFileList[i].path,
-          modify: getFileLastModifiedTime(songFileList[i]),
           size: getFileSize(songFileList[i])));
       }
       fileList=null;

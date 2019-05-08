@@ -15,7 +15,7 @@ class AudioModel extends Model{
     initAudioPlayer();
     
   }
-  List<LocalMusic> songList=[];
+  List<Music> songList=[];
   bool isPlaying=false;
   AudioPlayer audioPlayer;
   bool change=false;
@@ -38,9 +38,20 @@ void initAudioPlayer() {
       stop();
     }
     print(currentIndex);
-   await audioPlayer.play(songList[currentIndex].path, isLocal: true);
-   isPlaying = true;
+    try {
+      if (songList[currentIndex].url!=''&&songList[currentIndex].url!=null) {
+        print('是这个'+songList[currentIndex].url);
+      await audioPlayer.play(songList[currentIndex].url);
+    } else {
+      await audioPlayer.play(songList[currentIndex].path, isLocal: true);
+    }
+    isPlaying = true;
    notifyListeners();
+    } catch (e) {
+      print('无法播放音乐');
+    }
+   
+   
   }
    
    Future pause() async {
