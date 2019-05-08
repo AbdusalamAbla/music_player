@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:flutter/material.dart';
 
+enum MusicState{PLAYING,STOPPED,PAUSED}
 class AudioModel extends Model{
   
 
@@ -16,7 +17,7 @@ class AudioModel extends Model{
     
   }
   List<Music> songList=[];
-  bool isPlaying=false;
+  MusicState audioState=MusicState.STOPPED;
   AudioPlayer audioPlayer;
   bool change=false;
   String localFilePath;
@@ -34,10 +35,10 @@ void initAudioPlayer() {
   }
 
   Future play() async {
-    if(isPlaying){
+    if(audioState==MusicState.PLAYING||controller.index!=currentIndex){
       stop();
     }
-    print(currentIndex);
+    print('currentIndex :$currentIndex');
     try {
       if (songList[currentIndex].url!=''&&songList[currentIndex].url!=null) {
         print('是这个'+songList[currentIndex].url);
@@ -45,7 +46,7 @@ void initAudioPlayer() {
     } else {
       await audioPlayer.play(songList[currentIndex].path, isLocal: true);
     }
-    isPlaying = true;
+    audioState=MusicState.PLAYING;
    notifyListeners();
     } catch (e) {
       print('无法播放音乐');
@@ -56,17 +57,17 @@ void initAudioPlayer() {
    
    Future pause() async {
     await audioPlayer.pause();
-    isPlaying=false;
+    audioState=MusicState.PAUSED;
     notifyListeners();
   }
  Future stop() async {
     await audioPlayer.stop();
-     isPlaying=false;
+     audioState=MusicState.STOPPED;
       notifyListeners();
     
   }
   changeIndex(int index){
-    print(index);
+    print('changeTo  $index');
     currentIndex=index;
     controller.index=index;
     notifyListeners();
@@ -77,7 +78,7 @@ void initAudioPlayer() {
   }
   
   void onComplete() {
-     isPlaying=false;
+     audioState=MusicState.STOPPED;
      notifyListeners();
   }
 

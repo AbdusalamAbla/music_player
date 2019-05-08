@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:music_player/models/models.dart';
 
 import 'package:audioplayer/audioplayer.dart';
+import 'package:music_player/utils/music_playing.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 class MusicPlayer extends StatefulWidget{
@@ -69,7 +70,7 @@ _MusicPlayerState(this.audioModel);
     }, onError: (msg) {
       setState(() {
         
-        audioModel.isPlaying=false;
+        audioModel.audioState=MusicState.STOPPED;
         duration = new Duration(seconds: 0);
         position = new Duration(seconds: 0);
       });
@@ -87,7 +88,6 @@ _MusicPlayerState(this.audioModel);
       audioModel.controller.index=audioModel.currentIndex; 
      });
       //  isPlaying=_audioModel.isPlaying;
-       print('zheshi '+duration.toString());
        
     return ScopedModel<AudioModel>(
          model: audioModel,
@@ -150,16 +150,14 @@ _MusicPlayerState(this.audioModel);
               child: Row(
                 children: <Widget>[
                 IconButton(
-                    icon: audioModel.isPlaying?Icon(Icons.pause):Icon(Icons.play_arrow),
+                    icon: audioModel.audioState==MusicState.PLAYING?Icon(Icons.pause):Icon(Icons.play_arrow),
                      onPressed: (){
-                       if (audioModel.isPlaying) {
+                       if (audioModel.audioState==MusicState.PLAYING) {
                          audioModel.pause();
-                       } else {
-                         audioModel.play();
+                       } else if(audioModel.audioState==MusicState.PAUSED){
+                        audioModel.play();
                        }
-                       setState(() {
-                         audioModel.isPlaying?audioModel.isPlaying=false:audioModel.isPlaying=true;
-                         });
+                       
                      },
                ),
                IconButton(icon: Icon(Icons.menu), onPressed: () {},),      
