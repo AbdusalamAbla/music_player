@@ -35,7 +35,7 @@ void initAudioPlayer() {
   }
 
   Future play() async {
-    if(audioState==MusicState.PLAYING||controller.index!=currentIndex){
+    if(audioState==MusicState.PLAYING||audioState==MusicState.PAUSED){
       stop();
     }
     print('currentIndex :$currentIndex');
@@ -54,7 +54,24 @@ void initAudioPlayer() {
    
    
   }
+   Future contiNue() async{
+     
+    print('currentIndex :$currentIndex');
+    try {
+      if (songList[currentIndex].url!=''&&songList[currentIndex].url!=null) {
+        print('是这个'+songList[currentIndex].url);
+      await audioPlayer.play(songList[currentIndex].url);
+    } else {
+      await audioPlayer.play(songList[currentIndex].path, isLocal: true);
+    }
+    audioState=MusicState.PLAYING;
+   notifyListeners();
+    } catch (e) {
+      print('无法播放音乐');
+    }
    
+   
+   }
    Future pause() async {
     await audioPlayer.pause();
     audioState=MusicState.PAUSED;

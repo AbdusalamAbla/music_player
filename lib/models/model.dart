@@ -49,7 +49,7 @@ class Music extends ModelBase {
 
   @override
   String toString() {
-    return 'Music{id: $id, title: $title, artist:$artist, path:$path,size:$size}';
+    return 'Music{id: $id, title: $title, artist:$artist, path:$path,size:$size,url:$url}';
   }
 
  factory Music.fromMap(Map<String,dynamic> map){

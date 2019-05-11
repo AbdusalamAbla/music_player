@@ -344,7 +344,7 @@ class _ItemPlaylist extends StatelessWidget {
             MaterialPageRoute(
                 builder: (context) =>
                     ListDetail(playlist: playlist)));
-        print('u pressed this.${playlist.id}');
+        
       },
       child: Container(
         height: 60,

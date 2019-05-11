@@ -155,7 +155,7 @@ _MusicPlayerState(this.audioModel);
                        if (audioModel.audioState==MusicState.PLAYING) {
                          audioModel.pause();
                        } else if(audioModel.audioState==MusicState.PAUSED){
-                        audioModel.play();
+                        audioModel.contiNue();
                        }
                        
                      },
